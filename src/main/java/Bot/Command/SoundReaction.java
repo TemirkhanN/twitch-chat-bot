@@ -4,6 +4,7 @@ import Bot.Bot;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 
 public class SoundReaction extends CommandHandler {
@@ -74,10 +75,13 @@ public class SoundReaction extends CommandHandler {
     private void playSound(String soundFile) {
         new Thread(() -> {
             try {
+                InputStream fileStream = getClass().getClassLoader().getResourceAsStream(soundFile);
+                if (fileStream == null) {
+                    throw new RuntimeException("Couldn't get " + soundFile + ". Make sure it exists in resources.");
+                }
+
+                AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(fileStream));
                 Clip clip = AudioSystem.getClip();
-                AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                        new BufferedInputStream(getClass().getClassLoader().getResourceAsStream(soundFile))
-                );
                 clip.open(inputStream);
                 clip.addLineListener(myLineEvent -> {
                     if (myLineEvent.getType() == LineEvent.Type.STOP) {
