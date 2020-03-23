@@ -7,18 +7,30 @@ import java.io.BufferedInputStream;
 import java.util.HashMap;
 
 public class SoundReaction extends CommandHandler {
-    private static HashMap<String, String> reactions = new HashMap<>(8);
+    private static HashMap<String, String> reactions = new HashMap<>();
 
     // TODO Move to CDN. Also it may be cool to extend reactions in runtime through GUI
     static {
-        reactions.put("вут", "watafak");
-        reactions.put("ахем", "ahem.spy");
-        reactions.put("гоп", "gotcha");
+        reactions.put("бу", "boo");
+        reactions.put("остынь", "directed-by");
         reactions.put("хехе", "hehe-boy");
-        reactions.put("привет", "hello-there");
-        reactions.put("ой", "alert");
+        reactions.put("привет", "hello");
+        reactions.put("оу май", "oh-my");
+        reactions.put("rip", "rip");
         reactions.put("сюрприз", "surprise-motherfucker");
-        reactions.put("остынь", "directedby");
+        reactions.put("the end", "to-be-continued");
+        reactions.put("втф", "wtfit");
+        reactions.put("штоето", "wtfit");
+        reactions.put("вот это поворот", "what-a-turn");
+        reactions.put("ваау", "woooow");
+
+        //hidden
+        reactions.put("fap", "hidden/fap-fap");
+        reactions.put("какого", "hidden/huya");
+        reactions.put("johncena", "hidden/john-cena");
+        reactions.put("ненене", "hidden/nononono");
+        reactions.put("flick", "hidden/ricardo");
+        reactions.put("добро пожаловать сука", "hidden/rice-fields");
     }
 
     SoundReaction(String command) {
@@ -56,7 +68,7 @@ public class SoundReaction extends CommandHandler {
             return null;
         }
 
-        return "Sounds/" + soundName + ".wav";
+        return "sound/" + soundName + ".wav";
     }
 
     private void playSound(String soundFile) {
@@ -68,8 +80,9 @@ public class SoundReaction extends CommandHandler {
                 );
                 clip.open(inputStream);
                 clip.addLineListener(myLineEvent -> {
-                    if (myLineEvent.getType() == LineEvent.Type.STOP)
+                    if (myLineEvent.getType() == LineEvent.Type.STOP) {
                         clip.close();
+                    }
                 });
                 clip.setFramePosition(0);
                 clip.start();

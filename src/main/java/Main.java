@@ -26,7 +26,7 @@ public class Main {
         ArrayList<Announcement> announcements = new ArrayList<Announcement>(2);
         announcements.add(
                 new Announcement(
-                        "Гор объявляет вечеринку открытой!",
+                        "Бот присоединяется к вечеринке!",
                         bot
                 )
         );
