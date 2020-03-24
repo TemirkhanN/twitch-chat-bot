@@ -24,10 +24,10 @@ public class Channel {
         keepConnectionAlive = true;
     }
 
-    public void join(String botName, String token) {
+    public void join(Bot bot) {
         Request[] joiningMessages = {
-                new Request("PASS oauth:" + token),
-                new Request("NICK " + botName),
+                new Request("PASS oauth:" + bot.getToken()),
+                new Request("NICK " + bot.getName()),
                 new Request("JOIN #" + name)
         };
         try {
@@ -57,6 +57,7 @@ public class Channel {
     public Message readMessage() throws IOException {
         String data = connection.dataReceiver.readLine();
         Message message = new Message(data);
+        // TODO ping handler?
         if (message.isPing() && keepConnectionAlive) {
             connection.send(Request.acknowledgeAlive());
         }

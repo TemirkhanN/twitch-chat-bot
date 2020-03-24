@@ -1,6 +1,7 @@
 package Bot.Command;
 
 import Bot.Bot;
+import Bot.Command.Util.AudioPlayer;
 
 import java.util.HashMap;
 
@@ -24,8 +25,15 @@ public class SoundReaction extends CommandHandler {
         reactions.put("вау", "woooow");
         reactions.put("wow", "woooow");
 
+
+        // Emotion based
+
+        reactions.put("wutface", "wtfit");
+        reactions.put("kreygasm", "hidden/fap-fap");
+        reactions.put("kappa", "directed-by");
+        reactions.put("heyguys", "hello-there");
+
         //hidden
-        reactions.put("fap", "hidden/fap-fap");
         reactions.put("какого", "hidden/huya");
         reactions.put("johncena", "hidden/john-cena");
         reactions.put("ненене", "hidden/nononono");

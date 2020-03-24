@@ -5,20 +5,24 @@ import Bot.Command.Parser;
 
 import java.io.IOException;
 
-public class Bot {
-    private String name;
+public class Bot  extends User {
     private String token;
 
     private Channel channel;
 
     public Bot(String name, String token) {
-        this.name = name;
+        super(name);
+
         this.token = token;
+    }
+
+    String getToken() {
+        return token;
     }
 
     public void joinChannel(String channelName) {
         channel = new Channel(channelName);
-        channel.join(name, token);
+        channel.join(this);
         channel.keepConnectionAlive();
 
         listenToChat();
@@ -45,7 +49,7 @@ public class Bot {
                             continue;
                         }
 
-                        CommandHandler commandHandler = Parser.parseCommand(message.getCommonPart());
+                        CommandHandler commandHandler = Parser.parseCommand(message);
                         if (commandHandler != null) {
                             commandHandler.handleBy(handler);
                         }

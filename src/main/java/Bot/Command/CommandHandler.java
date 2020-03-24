@@ -5,8 +5,8 @@ import Bot.Bot;
 abstract public class CommandHandler {
     final String command;
 
-    CommandHandler(String passedCommand) {
-        command = passedCommand;
+    CommandHandler(String command) {
+        this.command = command;
     }
 
     public void handleBy(Bot executor) {

@@ -1,10 +1,10 @@
-package Bot.Command;
+package Bot.Command.Util;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 
-class AudioPlayer {
+public class AudioPlayer {
     private Clip player;
 
     private static AudioPlayer instance;
@@ -22,7 +22,7 @@ class AudioPlayer {
         }
     }
 
-    static AudioPlayer getPlayer() {
+    public static AudioPlayer getPlayer() {
         if (instance == null) {
             instance = new AudioPlayer();
         }
@@ -30,7 +30,7 @@ class AudioPlayer {
         return instance;
     }
 
-    void play(String audioFile) {
+    public void play(String audioFile) {
         // No audio intersection
         if (player.isRunning()) {
             return;
