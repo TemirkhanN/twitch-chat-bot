@@ -21,6 +21,8 @@ public class SoundReaction extends CommandHandler {
         reactions.put("штоето", "wtfit");
         reactions.put("вот это поворот", "what-a-turn");
         reactions.put("ваау", "woooow");
+        reactions.put("вау", "woooow");
+        reactions.put("wow", "woooow");
 
         //hidden
         reactions.put("fap", "hidden/fap-fap");

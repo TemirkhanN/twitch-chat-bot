@@ -23,6 +23,7 @@ public class Main {
     }
 
     private static void addAnnouncements(Bot bot) throws Exception {
+        // TODO add from configurable source
         ArrayList<Announcement> announcements = new ArrayList<Announcement>(2);
         announcements.add(
                 new Announcement(
