@@ -32,6 +32,10 @@ public class Bot  extends User {
         channel.sendMessage(message);
     }
 
+    public void whisper(User to, String message) {
+        channel.sendMessage("@" + to.getName() + " " + message);
+    }
+
     private void listenToChat() {
         class ChatCommandHandle implements Runnable {
             private Bot handler;

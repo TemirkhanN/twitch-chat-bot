@@ -1,4 +1,4 @@
-package Bot.Command.Util;
+package Util;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;

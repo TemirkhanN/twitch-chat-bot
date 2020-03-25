@@ -1,7 +1,7 @@
 package Bot.Command;
 
 import Bot.Bot;
-import Bot.Command.Util.AudioPlayer;
+import Util.AudioPlayer;
 
 import java.util.HashMap;
 
