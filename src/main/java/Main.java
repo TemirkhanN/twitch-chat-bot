@@ -39,14 +39,16 @@ public class Main {
                 )
         );
 
+        int repetitiveAnnouncementsCount = 1; //TODO
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(repetitiveAnnouncementsCount);
         for (Announcement announcement : announcements) {
-            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-            int announcementFrequency = announcement.getFrequency();
-            if (announcement.isRepetitive()) {
-                executor.scheduleAtFixedRate(announcement, announcementFrequency, announcementFrequency, TimeUnit.MINUTES);
-            } else {
+            if (!announcement.isRepetitive()) {
                 executor.execute(announcement);
+                continue;
             }
+
+            int announcementFrequency = announcement.getFrequency();
+            executor.scheduleAtFixedRate(announcement, announcementFrequency, announcementFrequency, TimeUnit.MINUTES);
         }
     }
 }
