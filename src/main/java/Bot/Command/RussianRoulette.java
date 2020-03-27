@@ -1,7 +1,6 @@
 package Bot.Command;
 
 import Bot.Bot;
-import Bot.User;
 import Game.GameException;
 import Game.Player;
 import Game.Roulette;
@@ -18,39 +17,37 @@ public class RussianRoulette extends CommandHandler {
 
     private static Roulette game;
 
-    private Player player;
-
     private final static ScheduledExecutorService lobbyTimer = Executors.newScheduledThreadPool(1);
 
-    RussianRoulette(String passedCommand, User participant) {
-        super(passedCommand);
-        this.player = new Player(participant.getName());
+    @Override
+    public boolean supports(Command command) {
+        return command.startsWith(COMMAND_PREFIX);
     }
 
     @Override
-    public boolean isValidCommand() {
-        return command.indexOf(COMMAND_PREFIX) == 0;
+    protected void run(Command command) {
+        Bot mediator = command.getMediator();
+        String commandText = command.getCommand();
+        Player player = new Player(command.getInitiator().getName());
+
+        switch(commandText) {
+            case JOIN_COMMAND:
+                if (game == null || game.isOver()) {
+                    createNewGame(mediator);
+                }
+                joinGame(player, mediator);
+                break;
+            case TAKE_TURN_COMMAND:
+                takeTurn(player, mediator);
+                break;
+            default:
+                mediator.sendMessage(getDescription());
+                break;
+        }
     }
 
-    @Override
-    protected void run(String Command, Bot executor) {
-        if (game == null || game.isOver()) {
-            createNewGame(executor);
-        }
-
-        if (command.equals(JOIN_COMMAND)) {
-            joinGame(executor);
-
-            return;
-        }
-
-        if (command.equals(TAKE_TURN_COMMAND)) {
-            takeTurn(executor);
-
-            return;
-        }
-
-        System.out.println("Unknown roulette command " + command);
+    protected String getDescription() {
+        return "Игра рулетка. Вступить в игру можно командой «!roulette join». Когда игра начнется, ход делается командой «!roulette go».";
     }
 
     private void createNewGame(Bot mediator) {
@@ -69,10 +66,10 @@ public class RussianRoulette extends CommandHandler {
                     mediator.sendMessage("Недостаточно игроков для начала игры.");
                 }
             }
-        }, 10, TimeUnit.SECONDS);
+        }, 1, TimeUnit.MINUTES);
     }
 
-    private void joinGame(Bot mediator) {
+    private void joinGame(Player player, Bot mediator) {
         try {
             game.join(player);
             mediator.sendMessage("@" + player.getName() + " вступает в игру.");
@@ -90,7 +87,7 @@ public class RussianRoulette extends CommandHandler {
         }
     }
 
-    private void takeTurn(Bot mediator) {
+    private void takeTurn(Player player, Bot mediator) {
         if (!game.hasPlayer(player)) {
             mediator.whisper(player.getName(), "ты не участвуешь в игре");
 
@@ -110,7 +107,7 @@ public class RussianRoulette extends CommandHandler {
         if (!turn.isLucky()) {
             message = "BANG! @" + player.getName() + "' выбывает из игры.";
             if (game.isOver()) {
-                message += "Поздравляю, @" + nextTurnBelongsTo.getName() + "! Твоя награда: %bets%";
+                message += "Поздравляю, @" + nextTurnBelongsTo.getName() + "! Твоя награда: (скоро добавим систему наград)";
             } else {
                 message += "@" + nextTurnBelongsTo.getName() + ", твой черед!";
             }

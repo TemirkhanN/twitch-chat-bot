@@ -1,10 +1,6 @@
-import Bot.Announcement;
 import Bot.Bot;
-
-import java.util.ArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import Bot.Command.RussianRoulette;
+import Bot.Command.SoundReaction;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,42 +9,15 @@ public class Main {
         String authToken = args[2];
 
         Bot chatBot = new Bot(botName, authToken);
+
+        // Register chat commands handlers
+        chatBot.addChatHandler(new SoundReaction());
+        chatBot.addChatHandler(new RussianRoulette());
+
+        chatBot.addAnnouncement("Бот присоединяется к вечеринке");
+        chatBot.addAnnouncement("Сообщения, вызывающие звуковые реакции на стриме, указаны в описании канала.", 15);
+        chatBot.addAnnouncement("Поделитесь интересными и(ли) безумные идеи для бота. Топчик обязательно будет добавлен в функционал.", 35);
+
         chatBot.joinChannel(channel);
-
-        try {
-            addAnnouncements(chatBot);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void addAnnouncements(Bot bot) throws Exception {
-        // TODO add from configurable source
-        ArrayList<Announcement> announcements = new ArrayList<Announcement>(2);
-        announcements.add(
-                new Announcement(
-                        "Бот присоединяется к вечеринке!",
-                        bot
-                )
-        );
-        announcements.add(
-                new Announcement(
-                        "Ищите звуковые реакции на стриме в описании канала. Хорошего настроения!",
-                        bot,
-                        15
-                )
-        );
-
-        int repetitiveAnnouncementsCount = 1; //TODO
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(repetitiveAnnouncementsCount);
-        for (Announcement announcement : announcements) {
-            if (!announcement.isRepetitive()) {
-                executor.execute(announcement);
-                continue;
-            }
-
-            int announcementFrequency = announcement.getFrequency();
-            executor.scheduleAtFixedRate(announcement, announcementFrequency, announcementFrequency, TimeUnit.MINUTES);
-        }
     }
 }

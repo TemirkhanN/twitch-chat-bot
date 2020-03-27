@@ -1,23 +1,17 @@
 package Bot.Command;
 
-import Bot.Bot;
-
 abstract public class CommandHandler {
-    final String command;
-
-    CommandHandler(String command) {
-        this.command = command;
-    }
-
-    public void handleBy(Bot executor) {
-        if (!isValidCommand()) {
+    public void execute(Command command) {
+        if (!supports(command)) {
             throw new RuntimeException("Command " + command + " is invalid and can not be handled");
         }
 
-        run(command, executor);
+        run(command);
     }
 
-    abstract public boolean isValidCommand();
+    abstract public boolean supports(Command command);
 
-    abstract protected void run(String Command, Bot executor);
+    abstract protected void run(Command command);
+
+    abstract protected String getDescription();
 }

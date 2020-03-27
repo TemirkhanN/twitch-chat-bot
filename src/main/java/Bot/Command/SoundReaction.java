@@ -1,6 +1,5 @@
 package Bot.Command;
 
-import Bot.Bot;
 import Util.AudioPlayer;
 
 import java.util.HashMap;
@@ -41,20 +40,16 @@ public class SoundReaction extends CommandHandler {
         reactions.put("добро пожаловать сука", "hidden/rice-fields");
     }
 
-    SoundReaction(String command) {
-        super(command.toLowerCase());
+    public boolean supports(Command command) {
+        return exists(command.getCommand());
     }
 
-    public boolean isValidCommand() {
-        return exists(command);
+    protected void run(Command command) {
+        playReaction(command.getCommand());
     }
 
-    protected void run(String Command, Bot executor) {
-        if (!isValidCommand()) {
-            return;
-        }
-
-        playReaction(command);
+    protected String getDescription() {
+        return "Звуковые реакции, которые воспроизводятся на стриме.";
     }
 
     private boolean exists(String reactionName) {
