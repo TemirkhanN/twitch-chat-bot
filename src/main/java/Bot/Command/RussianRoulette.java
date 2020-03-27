@@ -3,6 +3,7 @@ package Bot.Command;
 import Bot.Bot;
 import Bot.User;
 import Game.GameException;
+import Game.Player;
 import Game.Roulette;
 import Game.Turn;
 
@@ -14,18 +15,16 @@ public class RussianRoulette extends CommandHandler {
     private final static String COMMAND_PREFIX = "!roulette";
     private final static String JOIN_COMMAND = COMMAND_PREFIX + " join";
     private final static String TAKE_TURN_COMMAND = COMMAND_PREFIX + " go";
-    private final static String REVOLE_COMMAND = COMMAND_PREFIX + " revolve";
 
     private static Roulette game;
 
-    private User participant;
+    private Player player;
 
-    private ScheduledExecutorService lobbyTimer;
+    private final static ScheduledExecutorService lobbyTimer = Executors.newScheduledThreadPool(1);
 
     RussianRoulette(String passedCommand, User participant) {
         super(passedCommand);
-        this.participant = participant;
-        lobbyTimer = Executors.newScheduledThreadPool(1);
+        this.player = new Player(participant.getName());
     }
 
     @Override
@@ -39,22 +38,14 @@ public class RussianRoulette extends CommandHandler {
             createNewGame(executor);
         }
 
-        String player = participant.getName();
         if (command.equals(JOIN_COMMAND)) {
-            joinGame(player, executor);
+            joinGame(executor);
 
             return;
         }
 
         if (command.equals(TAKE_TURN_COMMAND)) {
-            takeTurn(player, executor);
-
-            return;
-        }
-
-        if (command.equals(REVOLE_COMMAND)) {
-            game.revolveCylinder();
-            takeTurn(player, executor);
+            takeTurn(executor);
 
             return;
         }
@@ -71,27 +62,27 @@ public class RussianRoulette extends CommandHandler {
 
             try {
                 game.start();
-                mediator.sendMessage("Игра началась! @" + game.getCurrentRevolverHolder() + " ты начинаешь.");
+                mediator.sendMessage("Игра началась! @" + game.getCurrentPlayer().getName() + " ты начинаешь.");
             } catch (GameException err) {
                 game = null;
                 if (err.getCode() == GameException.CODE_NOT_ENOUGH_PLAYERS) {
                     mediator.sendMessage("Недостаточно игроков для начала игры.");
                 }
             }
-        }, 5, TimeUnit.SECONDS);
+        }, 10, TimeUnit.SECONDS);
     }
 
-    private void joinGame(String player, Bot mediator) {
+    private void joinGame(Bot mediator) {
         try {
             game.join(player);
-            mediator.whisper(participant, " вступает в игру.");
+            mediator.sendMessage("@" + player.getName() + " вступает в игру.");
         } catch (GameException err) {
             switch(err.getCode()) {
                 case GameException.CODE_PLAYER_ALREADY_JOINED:
-                    mediator.whisper(participant, "ты уже участвуешь в игре.");
+                    mediator.whisper(player.getName(), "ты уже участвуешь в игре.");
                     break;
                 case GameException.CODE_GAME_HAS_ALREADY_STARTED:
-                    mediator.whisper(participant, "нельзя вступить в игру");
+                    mediator.whisper(player.getName(), "игра уже идет.");
                     break;
                 default:
                     System.err.println(err.toString());
@@ -99,23 +90,32 @@ public class RussianRoulette extends CommandHandler {
         }
     }
 
-    private void takeTurn(String player, Bot mediator) {
+    private void takeTurn(Bot mediator) {
         if (!game.hasPlayer(player)) {
+            mediator.whisper(player.getName(), "ты не участвуешь в игре");
+
+            return;
+        }
+
+        Player currentTurnBelongsTo = game.getCurrentPlayer();
+        if (!player.equals(currentTurnBelongsTo)) {
+            mediator.whisper(player.getName(), "сейчас не твой ход");
+
             return;
         }
 
         String message;
         Turn turn = game.takeTurn();
-        String nextPlayer = game.getCurrentRevolverHolder();
-        if (turn.isLucky()) {
-            message = "@" + player + "'у повезло. @" + nextPlayer + " твой черед!";
-        } else {
-            message = "BANG! @" + player + "' выбывает из игры.";
+        Player nextTurnBelongsTo = game.getCurrentPlayer();
+        if (!turn.isLucky()) {
+            message = "BANG! @" + player.getName() + "' выбывает из игры.";
             if (game.isOver()) {
-                message += "Поздравляю, @" + nextPlayer + "! Твоя награда: %bets%";
+                message += "Поздравляю, @" + nextTurnBelongsTo.getName() + "! Твоя награда: %bets%";
             } else {
-                message += "@" + nextPlayer + ", твой черед!";
+                message += "@" + nextTurnBelongsTo.getName() + ", твой черед!";
             }
+        } else {
+            message = "@" + player.getName() + "'у повезло. @" + nextTurnBelongsTo.getName() + " твой черед!";
         }
 
         mediator.sendMessage(message);

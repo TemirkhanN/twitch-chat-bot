@@ -3,36 +3,11 @@ package Game;
 import java.util.Random;
 
 public class Revolver {
-    private enum Round {
-        DUMMY,
-        DEADLY
-    }
-
-    private CircularQueue<Round> cylinder;
-
-    Revolver() {
-        cylinder = new CircularQueue<>();
-        cylinder.add(Round.DEADLY);
-        cylinder.add(Round.DUMMY);
-        cylinder.add(Round.DUMMY);
-        cylinder.add(Round.DUMMY);
-        cylinder.add(Round.DUMMY);
-        cylinder.add(Round.DUMMY);
-        revolve();
-    }
-
-    public void revolve() {
-        cylinder.movePointer((new Random()).nextInt(6));
-    }
+    private static Random randomizer = new Random();
 
     public boolean shoot() {
-        if (cylinder.current() == Round.DEADLY) {
-            cylinder.next();
-
-            return true;
-        }
-        cylinder.next();
-
-        return false;
+        // We take bias that there is less chance to get shot if we revolve cylinder after each shooting attempt
+        // TODO Very random.. meh
+       return randomizer.nextInt(6) == 3;
     }
 }

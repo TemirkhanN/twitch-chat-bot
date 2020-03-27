@@ -33,7 +33,11 @@ public class Bot  extends User {
     }
 
     public void whisper(User to, String message) {
-        channel.sendMessage("@" + to.getName() + " " + message);
+        channel.sendMessage("@" + to.getName() + ", " + message);
+    }
+
+    public void whisper(String to, String message) {
+        channel.sendMessage("@" + to + ", " + message);
     }
 
     private void listenToChat() {

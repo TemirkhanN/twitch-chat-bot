@@ -18,8 +18,8 @@ public class GameException extends Exception {
         return new GameException("Нельзя вступить в игру, пока не закончилась предыдущая", CODE_GAME_HAS_ALREADY_STARTED);
     }
 
-    static GameException playerHasAlreadyJoinedTheGame(String playerName) {
-        return new GameException("Игрок " + playerName + " уже вступил в игру", CODE_PLAYER_ALREADY_JOINED);
+    static GameException playerHasAlreadyJoinedTheGame(Player player) {
+        return new GameException("Игрок " + player.getName() + " уже вступил в игру", CODE_PLAYER_ALREADY_JOINED);
     }
 
     static GameException notEnoughPlayers() {

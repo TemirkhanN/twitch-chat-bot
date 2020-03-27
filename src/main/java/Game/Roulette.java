@@ -1,5 +1,7 @@
 package Game;
 
+import java.util.ArrayList;
+
 public class Roulette {
     public enum State {
         LOOKING_FOR_PLAYERS,
@@ -9,22 +11,36 @@ public class Roulette {
 
     private Enum state;
 
-    private CircularQueue<String> players;
+    private ArrayList<Player> players;
 
     private Revolver revolver;
 
+    private int currentPlayerPosition;
+
     public Roulette() {
         state = State.LOOKING_FOR_PLAYERS;
-        players = new CircularQueue<>();
+        players = new ArrayList<>();
         revolver = new Revolver();
     }
 
-    public void join(String player) throws GameException {
+    public boolean isStarted() {
+        return state == State.STARTED;
+    }
+
+    public boolean isLookingForPlayers() {
+        return state == State.LOOKING_FOR_PLAYERS;
+    }
+
+    public boolean isOver() {
+        return state == State.OVER;
+    }
+
+    public void join(Player player) throws GameException {
         if (!isLookingForPlayers()) {
             throw GameException.notOpenedForNewParticipants();
         }
 
-        if (players.contains(player)){
+        if(players.contains(player)) {
             throw GameException.playerHasAlreadyJoinedTheGame(player);
         }
 
@@ -44,6 +60,7 @@ public class Roulette {
             throw GameException.notEnoughPlayers();
         }
 
+        currentPlayerPosition = 0;
         state = State.STARTED;
     }
 
@@ -52,47 +69,64 @@ public class Roulette {
             throw new RuntimeException("Игра еще не началась");
         }
 
-        String playerName = players.current();
-        players.next(); // Move pointer to next participant
-        if (revolver.shoot()) {
-            players.remove(playerName);
+        Player currentPlayer;
+        do {
+            currentPlayerPosition = ++currentPlayerPosition % players.size();
+            currentPlayer = players.get(currentPlayerPosition);
+        } while (currentPlayer.isLost());
 
-            if (players.size() == 1) {
-                finishTheGame();
-            }
-
-            return Turn.unlucky(playerName);
+        if (!revolver.shoot()) {
+            return Turn.lucky(currentPlayer.getName());
         }
 
-        return Turn.lucky(playerName);
+        currentPlayer.lose();
+        if (getWinner() != null) {
+            finishTheGame();
+        }
+
+        return Turn.unlucky(currentPlayer.getName());
     }
 
-    public void revolveCylinder() {
-        revolver.revolve();
+    public Player getCurrentPlayer() {
+        if (players.size() == 0) {
+            return null;
+        }
+
+        if (isOver()) {
+            return getWinner();
+        }
+
+        int playerPosition = currentPlayerPosition;
+        Player currentPlayer;
+        do {
+            currentPlayer = players.get(playerPosition);
+            playerPosition = ++playerPosition % players.size();
+        } while (currentPlayer.isLost());
+
+        return currentPlayer;
     }
 
-    public String getCurrentRevolverHolder() {
-        return players.current();
-    }
-
-    public boolean hasPlayer(String player) {
-        return players.contains(player);
+    public boolean hasPlayer(Player player) {
+        return players.stream().anyMatch(existingPlayer -> existingPlayer.equals(player));
     }
 
     private void finishTheGame() {
         state = State.OVER;
     }
 
+    private Player getWinner() {
+        Player activePlayer = null;
+        for (Player player: players) {
+            if (!player.isLost()) {
+                // if there is active player already then there is not winner yet
+                if (activePlayer != null) {
+                    return null;
+                }
 
-    public boolean isStarted() {
-        return state == State.STARTED;
-    }
+                activePlayer = player;
+            }
+        }
 
-    public boolean isLookingForPlayers() {
-        return state == State.LOOKING_FOR_PLAYERS;
-    }
-
-    public boolean isOver() {
-        return state == State.OVER;
+        return activePlayer;
     }
 }

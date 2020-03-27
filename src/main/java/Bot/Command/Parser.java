@@ -2,6 +2,7 @@ package Bot.Command;
 
 import Bot.Message;
 
+// TODO factory
 public class Parser {
     public static CommandHandler parseCommand(Message message) {
         CommandHandler commandHandler;
