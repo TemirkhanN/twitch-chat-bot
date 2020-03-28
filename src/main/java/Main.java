@@ -15,7 +15,7 @@ public class Main {
         chatBot.addChatHandler(new RussianRoulette());
 
         chatBot.addAnnouncement("Бот присоединяется к вечеринке");
-        chatBot.addAnnouncement("Сообщения, вызывающие звуковые реакции на стриме, указаны в описании канала.", 15);
+        chatBot.addAnnouncement("Сообщения, вызывающие звуковые реакции на стриме, указаны в описании канала.", 20);
         chatBot.addAnnouncement("Поделитесь интересными и(ли) безумные идеи для бота. Топчик обязательно будет добавлен в функционал.", 35);
 
         chatBot.joinChannel(channel);
