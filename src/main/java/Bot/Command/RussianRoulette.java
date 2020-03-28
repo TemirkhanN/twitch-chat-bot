@@ -105,7 +105,7 @@ public class RussianRoulette extends CommandHandler {
         Turn turn = game.takeTurn();
         Player nextTurnBelongsTo = game.getCurrentPlayer();
         if (!turn.isLucky()) {
-            message = "BANG! @" + player.getName() + "' выбывает из игры.";
+            message = "Раздается звук выстрела и @" + player.getName() + "' выбывает из игры.";
             if (game.isOver()) {
                 message += "Поздравляю, @" + nextTurnBelongsTo.getName() + "! Твоя награда: (скоро добавим систему наград)";
             } else {
