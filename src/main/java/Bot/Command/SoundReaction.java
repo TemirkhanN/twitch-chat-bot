@@ -41,11 +41,11 @@ public class SoundReaction extends CommandHandler {
     }
 
     public boolean supports(Command command) {
-        return exists(command.getCommand());
+        return exists(command.getCommand().toLowerCase());
     }
 
     protected void run(Command command) {
-        playReaction(command.getCommand());
+        playReaction(command.getCommand().toLowerCase());
     }
 
     protected String getDescription() {
