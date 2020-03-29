@@ -5,7 +5,10 @@ import Bot.Command.CommandBus;
 import Bot.Command.CommandHandler;
 
 import java.io.IOException;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +20,10 @@ public class Bot  extends User {
     private ArrayList<Announcement> singleTimeAnnouncements;
     private ArrayList<Announcement> repeatingAnnouncements;
 
+    // TODO separate into full logger
+    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private Writer logger;
+
     public Bot(String name, String token) {
         super(name);
 
@@ -24,6 +31,15 @@ public class Bot  extends User {
         commandBus = new CommandBus();
         singleTimeAnnouncements = new ArrayList<>();
         repeatingAnnouncements = new ArrayList<>();
+        logger = Writer.nullWriter();
+    }
+
+    public void setLogger(Writer logWriter) {
+        if (logWriter == null) {
+            return;
+        }
+
+        logger = logWriter;
     }
 
     String getToken() {
@@ -92,7 +108,7 @@ public class Bot  extends User {
                     Message message;
                     String command;
                     while ((message = channel.readMessage()) != null) {
-                        System.out.println(message.toString());
+                        log(message.toString());
                         // We don't handle non common messages received in chat
                         command = message.getCommonPart();
                         if (command != null) {
@@ -100,14 +116,26 @@ public class Bot  extends User {
                         }
                     }
                     channel.leave();
+                    logger.close();
                 } catch (IOException e) {
                     // TODO
-                    System.out.println(e.toString());
+                    System.err.println(e.toString());
                     channel.leave();
                 }
             }
         }
 
         new Thread(new ChatCommandHandle(this)).start();
+    }
+
+    private void log(String data) {
+        String formattedMessage = dateFormatter.format(new Date()) + ": " + data;
+        try {
+            logger.write(formattedMessage);
+            logger.flush();
+        } catch (IOException e) {
+            System.err.println("Couldn't write to log because: " + e.toString());
+            System.out.println(formattedMessage);
+        }
     }
 }
