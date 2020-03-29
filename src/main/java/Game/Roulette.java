@@ -64,9 +64,9 @@ public class Roulette {
         state = State.STARTED;
     }
 
-    public Turn takeTurn() {
+    public Turn takeTurn() throws GameException {
         if (!isStarted()) {
-            throw new RuntimeException("Игра еще не началась");
+            throw GameException.gameHasNotStartedYet();
         }
 
         Player currentPlayer;

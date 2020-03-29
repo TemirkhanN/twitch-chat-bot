@@ -101,8 +101,15 @@ public class RussianRoulette extends CommandHandler {
             return;
         }
 
+        Turn turn;
+        try {
+            turn = game.takeTurn();
+        } catch (GameException e) {
+            mediator.whisper(player.getName(), "ты не должен сейчас этого делать");
+            return;
+        }
+
         String message;
-        Turn turn = game.takeTurn();
         Player nextTurnBelongsTo = game.getCurrentPlayer();
         if (!turn.isLucky()) {
             message = "Раздается звук выстрела и @" + player.getName() + "' выбывает из игры.";

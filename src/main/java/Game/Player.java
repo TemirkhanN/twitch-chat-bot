@@ -21,6 +21,10 @@ public class Player {
     }
 
     public boolean equals(Player player) {
+        if (player == null) {
+            return false;
+        }
+
         return name.equals(player.getName());
     }
 }
