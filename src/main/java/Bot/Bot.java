@@ -4,8 +4,7 @@ import Bot.Command.Command;
 import Bot.Command.CommandBus;
 import Bot.Command.CommandHandler;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,7 +30,6 @@ public class Bot  extends User {
         commandBus = new CommandBus();
         singleTimeAnnouncements = new ArrayList<>();
         repeatingAnnouncements = new ArrayList<>();
-        logger = Writer.nullWriter();
     }
 
     public void setLogger(Writer logWriter) {
@@ -130,6 +128,13 @@ public class Bot  extends User {
 
     private void log(String data) {
         String formattedMessage = dateFormatter.format(new Date()) + ": " + data;
+
+        if (logger == null) {
+            System.out.println(formattedMessage);
+
+            return;
+        }
+
         try {
             logger.write(formattedMessage);
             logger.flush();

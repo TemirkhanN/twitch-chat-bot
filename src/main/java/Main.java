@@ -14,7 +14,14 @@ public class Main {
         Bot chatBot = new Bot(botName, authToken);
         Charset charset = Charset.forName("utf-8");
         try {
-            chatBot.setLogger(new PrintWriter(System.getProperty("user.dir") + "/chat-bot-log.txt", charset));
+            chatBot.setLogger(
+                    new PrintWriter(
+                            new OutputStreamWriter(
+                                    new FileOutputStream(System.getProperty("user.dir") + "/chat-bot-log.txt"),
+                                    charset
+                            )
+                    )
+            );
         } catch (IOException e) {
             chatBot.setLogger(new BufferedWriter(new OutputStreamWriter(System.out, charset)));
         }
