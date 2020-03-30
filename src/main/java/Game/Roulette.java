@@ -71,8 +71,8 @@ public class Roulette {
 
         Player currentPlayer;
         do {
-            currentPlayerPosition = currentPlayerPosition % players.size();
-            currentPlayer = players.get(currentPlayerPosition++);
+            currentPlayer = players.get(currentPlayerPosition);
+            currentPlayerPosition = (currentPlayerPosition + 1) % players.size();
         } while (currentPlayer.isLost());
 
         if (!revolver.shoot()) {
@@ -100,7 +100,7 @@ public class Roulette {
         Player currentPlayer;
         do {
             currentPlayer = players.get(playerPosition);
-            playerPosition = ++playerPosition % players.size();
+            playerPosition = (playerPosition + 1) % players.size();
         } while (currentPlayer.isLost());
 
         return currentPlayer;

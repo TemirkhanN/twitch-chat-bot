@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class RussianRoulette extends CommandHandler {
-    private final static String COMMAND_PREFIX = "!roulette";
+    private final static String COMMAND_PREFIX = "!r";
     private final static String JOIN_COMMAND = COMMAND_PREFIX + " join";
     private final static String TAKE_TURN_COMMAND = COMMAND_PREFIX + " go";
 
@@ -21,7 +21,20 @@ public class RussianRoulette extends CommandHandler {
 
     @Override
     public boolean supports(Command command) {
-        return command.startsWith(COMMAND_PREFIX);
+        String commandText = command.getCommand();
+        if (commandText.equals(JOIN_COMMAND)) {
+            return true;
+        }
+
+        if (commandText.equals(TAKE_TURN_COMMAND)) {
+            return true;
+        }
+
+        if (commandText.equals(COMMAND_PREFIX)) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -32,9 +45,6 @@ public class RussianRoulette extends CommandHandler {
 
         switch(commandText) {
             case JOIN_COMMAND:
-                if (game == null || game.isOver()) {
-                    createNewGame(mediator);
-                }
                 joinGame(player, mediator);
                 break;
             case TAKE_TURN_COMMAND:
@@ -47,7 +57,7 @@ public class RussianRoulette extends CommandHandler {
     }
 
     protected String getDescription() {
-        return "Игра рулетка. Вступить в игру можно командой «!roulette join». Когда игра начнется, ход делается командой «!roulette go».";
+        return "Игра рулетка. Вступить в игру можно командой «!r join». Когда игра начнется, ход делается командой «!r go».";
     }
 
     private void createNewGame(Bot mediator) {
@@ -70,6 +80,10 @@ public class RussianRoulette extends CommandHandler {
     }
 
     private void joinGame(Player player, Bot mediator) {
+        if (game == null || game.isOver()) {
+            createNewGame(mediator);
+        }
+
         try {
             game.join(player);
             mediator.sendMessage("@" + player.getName() + " вступает в игру.");
@@ -88,6 +102,12 @@ public class RussianRoulette extends CommandHandler {
     }
 
     private void takeTurn(Player player, Bot mediator) {
+        if (game == null || game.isOver()) {
+            mediator.whisper(player.getName(), "Сейчас нет доступных игр. Создай свою командой " + JOIN_COMMAND);
+
+            return;
+        }
+
         if (!game.hasPlayer(player)) {
             mediator.whisper(player.getName(), "ты не участвуешь в игре");
 
