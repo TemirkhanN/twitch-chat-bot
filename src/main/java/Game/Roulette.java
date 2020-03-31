@@ -40,7 +40,7 @@ public class Roulette {
             throw GameException.notOpenedForNewParticipants();
         }
 
-        if(players.contains(player)) {
+        if(hasPlayer(player)) {
             throw GameException.playerHasAlreadyJoinedTheGame(player);
         }
 
