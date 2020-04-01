@@ -31,6 +31,8 @@ public class SoundReaction extends CommandHandler {
         reactions.put("kreygasm", "hidden/fap-fap");
         reactions.put("kappa", "directed-by");
         reactions.put("heyguys", "hello");
+        reactions.put("pogchamp", "what-a-turn");
+        reactions.put("riPepperonis", "rip");
 
         //hidden
         reactions.put("какого", "hidden/huya");

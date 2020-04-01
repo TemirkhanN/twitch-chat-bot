@@ -131,11 +131,14 @@ public class RussianRoulette extends CommandHandler {
 
         String message;
         Player nextTurnBelongsTo = game.getCurrentPlayer();
+        String reactionSound = null;
         if (!turn.isLucky()) {
             message = "Раздается звук выстрела и @" + player.getName() + "' выбывает из игры.";
             if (game.isOver()) {
+                reactionSound = "PogChamp";
                 message += "Поздравляю, @" + nextTurnBelongsTo.getName() + "! Твоя награда: (скоро добавим систему наград)";
             } else {
+                reactionSound = "riPepperonis";
                 message += "@" + nextTurnBelongsTo.getName() + ", твой черед!";
             }
         } else {
@@ -143,5 +146,8 @@ public class RussianRoulette extends CommandHandler {
         }
 
         mediator.sendMessage(message);
+        if (reactionSound != null) {
+            mediator.sendMessage(reactionSound);
+        }
     }
 }
