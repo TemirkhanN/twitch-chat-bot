@@ -9,6 +9,7 @@ public class SoundReaction extends CommandHandler {
 
     // TODO Move to CDN. Also it may be cool to extend reactions in runtime through GUI
     static {
+        // Plain text
         reactions.put("бу", "boo");
         reactions.put("остынь", "directed-by");
         reactions.put("хехе", "hehe-boy");
@@ -17,22 +18,30 @@ public class SoundReaction extends CommandHandler {
         reactions.put("rip", "rip");
         reactions.put("сюрприз", "surprise-motherfucker");
         reactions.put("the end", "to-be-continued");
+        reactions.put("енд", "to-be-continued");
+        reactions.put("to be continued", "to-be-continued");
+        reactions.put("вот это поворот", "what-a-turn");
         reactions.put("втф", "wtfit");
         reactions.put("штоето", "wtfit");
-        reactions.put("вот это поворот", "what-a-turn");
+        reactions.put("вут", "watafak");
+        reactions.put("wat", "watafak");
         reactions.put("ваау", "woooow");
         reactions.put("вау", "woooow");
         reactions.put("wow", "woooow");
-
+        reactions.put("брух", "bruh");
+        reactions.put("bruh", "bruh");
+        reactions.put("nani", "nani");
+        reactions.put("нани", "nani");
+        reactions.put("omae wa mou shindeiru", "nani");
 
         // Emotion based
-
         reactions.put("wutface", "wtfit");
         reactions.put("kreygasm", "hidden/fap-fap");
         reactions.put("kappa", "directed-by");
         reactions.put("heyguys", "hello");
         reactions.put("pogchamp", "what-a-turn");
-        reactions.put("riPepperonis", "rip");
+        reactions.put("ripepperonis", "rip");
+        reactions.put("cmonBruh", "bruh");
 
         //hidden
         reactions.put("какого", "hidden/huya");
