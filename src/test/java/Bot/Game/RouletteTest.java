@@ -6,14 +6,11 @@ import Game.Roulette;
 import Game.Turn;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class RouletteTest {
     private static final int ERROR_GAME_IS_IN_PROGRESS = 1;
     private static final int ERROR_NOT_ENOUGH_PLAYERS = 2;
