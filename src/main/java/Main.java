@@ -30,9 +30,9 @@ public class Main {
         chatBot.addChatHandler(new SoundReaction());
         chatBot.addChatHandler(new RussianRoulette());
 
-        chatBot.addAnnouncement("Бот присоединяется к вечеринке");
-        chatBot.addAnnouncement("Сообщения, вызывающие звуковые реакции на стриме, указаны в описании канала.", 20);
-        chatBot.addAnnouncement("Поделитесь интересными и(ли) безумные идеи для бота. Топчик обязательно будет добавлен в функционал.", 35);
+        chatBot.addAnnouncement("Звуковые реакции в описании канала.", 20);
+        chatBot.addAnnouncement("Аудио-поток регулируется здесь: https://streamdj.ru/c/Project_Kaom", 31);
+        chatBot.addAnnouncement("Новые реакции и идеи для бота можно предложить в https://discord.gg/tXu6Cze", 36);
 
         chatBot.joinChannel(channel);
     }
