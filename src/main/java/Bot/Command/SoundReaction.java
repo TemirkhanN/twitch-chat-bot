@@ -40,6 +40,7 @@ public class SoundReaction extends CommandHandler {
         reactions.put("ненене", "hidden/nononono");
         reactions.put("flick", "hidden/ricardo");
         reactions.put("suffer", "hidden/rice-fields");
+		reactions.put("moment", "hidden/moment");
     }
 
     public boolean supports(Command command) {
