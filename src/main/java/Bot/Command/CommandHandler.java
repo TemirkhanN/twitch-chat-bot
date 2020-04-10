@@ -13,5 +13,7 @@ abstract public class CommandHandler {
 
     abstract protected void run(Command command);
 
-    abstract protected String getDescription();
+    protected String getDescription() {
+        return "Описание команды отсутствует";
+    }
 }
