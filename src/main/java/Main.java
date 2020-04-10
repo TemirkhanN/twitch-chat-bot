@@ -1,6 +1,5 @@
 import Bot.Bot;
-import Bot.Command.RussianRoulette;
-import Bot.Command.SoundReaction;
+import Bot.Command.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -10,6 +9,8 @@ public class Main {
         String channel = args[0];
         String botName = args[1];
         String authToken = args[2];
+        String twitchDjKey = args[3];
+        int twitchDjChannel = Integer.parseInt(args[4]);
 
         Bot chatBot = new Bot(botName, authToken);
         Charset charset = Charset.forName("utf-8");
@@ -29,10 +30,15 @@ public class Main {
         // Register chat commands handlers
         chatBot.addChatHandler(new SoundReaction());
         chatBot.addChatHandler(new RussianRoulette());
+        chatBot.addChatHandler(new DJ(twitchDjChannel, twitchDjKey));
 
-        chatBot.addAnnouncement("Звуковые реакции в описании канала.", 20);
+        Answer answer = new Answer();
+        answer.addAnswer("!tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
+        chatBot.addChatHandler(answer);
+
+        chatBot.addAnnouncement("Звуковые реакции и команды для бота в описании канала.", 20);
         chatBot.addAnnouncement("Аудио-поток регулируется здесь: https://streamdj.ru/c/Project_Kaom", 31);
-        chatBot.addAnnouncement("Новые реакции и идеи для бота можно предложить в https://discord.gg/tXu6Cze", 36);
+        chatBot.addAnnouncement("Новые реакции и идеи для бота можно предложить в https://discord.gg/tXu6Cze", 60);
 
         chatBot.joinChannel(channel);
     }
