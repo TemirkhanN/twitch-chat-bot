@@ -34,6 +34,8 @@ public class Main {
 
         Answer answer = new Answer();
         answer.addAnswer("!tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
+        answer.addAnswer("!vk", "Паблик https://vk.com/project_kaom");
+        answer.addAnswer("!youtube", "Канал https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
         chatBot.addChatHandler(answer);
 
         chatBot.addAnnouncement("Звуковые реакции и команды для бота в описании канала.", 20);
