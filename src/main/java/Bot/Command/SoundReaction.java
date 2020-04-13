@@ -41,10 +41,18 @@ public class SoundReaction extends CommandHandler {
         reactions.put("ненене", "hidden/nononono");
         reactions.put("flick", "hidden/ricardo");
         reactions.put("suffer", "hidden/rice-fields");
+
+        //individual
+        reactions.put("slave", "individual/laddrussoo/gachslaves");
     }
 
     public boolean supports(Command command) {
-        return exists(command.getCommand().toLowerCase());
+        String reactionName = command.getCommand().toLowerCase();
+        if (!exists(reactionName)) {
+            return false;
+        }
+
+        return isAllowedToUseReaction(command.getInitiator().getName(), reactionName);
     }
 
     protected void run(Command command) {
@@ -86,5 +94,18 @@ public class SoundReaction extends CommandHandler {
                 System.err.println("Audio player failure." + e.toString());
             }
         }).start();
+    }
+
+    private boolean isAllowedToUseReaction(String user, String reaction) {
+        String reactionFilePath = getReactionSoundPath(reaction);
+        if (reactionFilePath.contains("individual/" + user.toLowerCase() + "/")) {
+            return true;
+        }
+
+        if (!reactionFilePath.contains("individual/")) {
+            return true;
+        }
+
+        return false;
     }
 }
