@@ -3,6 +3,8 @@ package Bot.Command;
 import java.util.HashMap;
 
 public class Answer extends CommandHandler {
+    public static final String PLACEHOLDER_SENDER_NAME = "%username%";
+
     private HashMap<String, String> answers;
 
     public Answer() {
@@ -24,6 +26,10 @@ public class Answer extends CommandHandler {
 
         if (response == null) {
             return;
+        }
+
+        if (response.contains(PLACEHOLDER_SENDER_NAME)) {
+            response = response.replaceAll(PLACEHOLDER_SENDER_NAME, command.getInitiator().getName());
         }
 
         command.getMediator().sendMessage(response);
