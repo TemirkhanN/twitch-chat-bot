@@ -32,11 +32,11 @@ public class Main {
         chatBot.addChatHandler(new RussianRoulette());
         chatBot.addChatHandler(new DJ(twitchDjChannel, twitchDjKey));
 
-        Answer answer = new Answer();
-        answer.addAnswer("!tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
-        answer.addAnswer("!vk", "Паблик https://vk.com/project_kaom");
-        answer.addAnswer("!youtube", "Канал https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
-        chatBot.addChatHandler(answer);
+        Question question = new Question();
+        question.addAnswer("!tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
+        question.addAnswer("!vk", "Паблик https://vk.com/project_kaom");
+        question.addAnswer("!youtube", "Канал https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
+        chatBot.addChatHandler(question);
 
         chatBot.addAnnouncement("Звуковые реакции и команды для бота в описании канала.", 20);
         chatBot.addAnnouncement("Аудио-поток регулируется здесь: https://streamdj.ru/c/Project_Kaom", 31);

@@ -2,12 +2,12 @@ package Bot.Command;
 
 import java.util.HashMap;
 
-public class Answer extends CommandHandler {
+public class Question extends CommandHandler {
     public static final String PLACEHOLDER_SENDER_NAME = "%username%";
 
     private HashMap<String, String> answers;
 
-    public Answer() {
+    public Question() {
         answers = new HashMap<>();
     }
 
