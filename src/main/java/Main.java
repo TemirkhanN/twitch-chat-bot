@@ -36,6 +36,7 @@ public class Main {
         question.addAnswer("!tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
         question.addAnswer("!vk", "Паблик https://vk.com/project_kaom");
         question.addAnswer("!youtube", "Канал https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
+        question.addAnswer("!whoami", "https://github.com/Project-Kaom/twitch-community-awards/blob/master/achievements.md#" + Question.PLACEHOLDER_SENDER_NAME);
         chatBot.addChatHandler(question);
 
         chatBot.addAnnouncement("Звуковые реакции и команды для бота в описании канала.", 20);
