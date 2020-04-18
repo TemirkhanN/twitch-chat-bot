@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
 group 'me.temirkhan.twitchchatbot'
@@ -26,11 +28,18 @@ test {
     useJUnitPlatform()
 }
 
+mainClassName = 'Launcher'
+javafx {
+    version = "14"
+    modules = [ 'javafx.controls' , 'javafx.fxml', 'javafx.graphics' ]
+}
+
 jar {
     manifest {
-        attributes(
-                'Main-Class': 'Main'
-        )
+        attributes 'Main-Class': 'Launcher'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

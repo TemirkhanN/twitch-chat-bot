@@ -3,6 +3,7 @@ package Bot;
 import Bot.Command.Command;
 import Bot.Command.CommandBus;
 import Bot.Command.CommandHandler;
+import Util.Logger.Logger;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -21,7 +22,7 @@ public class Bot  extends User {
 
     // TODO separate into full logger
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    private Writer logger;
+    private Logger logger;
 
     public Bot(String name, String token) {
         super(name);
@@ -32,7 +33,7 @@ public class Bot  extends User {
         repeatingAnnouncements = new ArrayList<>();
     }
 
-    public void setLogger(Writer logWriter) {
+    public void setLogger(Logger logWriter) {
         if (logWriter == null) {
             return;
         }
@@ -51,6 +52,15 @@ public class Bot  extends User {
 
         handleAnnouncements();
         listenToChat();
+    }
+
+    public void stop() {
+        if (channel == null) {
+            return;
+        }
+
+        channel.leave();
+        logger = null;
     }
 
     public void addAnnouncement(String text) {
@@ -113,12 +123,11 @@ public class Bot  extends User {
                             commandBus.execute(new Command(command, message.getSender(), handler));
                         }
                     }
-                    channel.leave();
-                    logger.close();
                 } catch (IOException e) {
                     // TODO
                     System.err.println(e.toString());
-                    channel.leave();
+                } finally {
+                    stop();
                 }
             }
         }
@@ -135,12 +144,6 @@ public class Bot  extends User {
             return;
         }
 
-        try {
-            logger.write(formattedMessage);
-            logger.flush();
-        } catch (IOException e) {
-            System.err.println("Couldn't write to log because: " + e.toString());
-            System.out.println(formattedMessage);
-        }
+        logger.log(formattedMessage);
     }
 }

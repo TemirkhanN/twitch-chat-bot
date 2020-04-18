@@ -46,6 +46,10 @@ public class Channel {
     }
 
     public void leave() {
+        if (!connection.isActive()) {
+            return;
+        }
+
         try {
             connection.send(new Request("PART #" + name));
         } catch (IOException e) {
@@ -55,6 +59,10 @@ public class Channel {
     }
 
     public Message readMessage() throws IOException {
+        if (!connection.isActive()) {
+            return null;
+        }
+
         String data = connection.dataReceiver.readLine();
         Message message = new Message(data);
         // TODO ping handler?

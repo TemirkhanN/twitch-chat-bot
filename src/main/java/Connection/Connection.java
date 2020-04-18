@@ -16,7 +16,7 @@ public class Connection {
         INACTIVE
     }
 
-    private State status = State.INACTIVE;
+    private State status;
 
     public Connection() throws IOException {
         instance = new Socket("irc.chat.twitch.tv", 6667);
@@ -24,6 +24,7 @@ public class Connection {
         Charset charset = Charset.forName("utf-8");
         dataReceiver = new BufferedReader(new InputStreamReader(instance.getInputStream(), charset));
         dataSender   = new BufferedWriter(new OutputStreamWriter(instance.getOutputStream(), charset));
+        status = State.ACTIVE;
     }
 
     public void send(Request[] requests) throws IOException {
@@ -40,12 +41,17 @@ public class Connection {
 
     public void close() {
         if (instance.isClosed()) {
+            status = State.INACTIVE;
+
             return;
         }
+
         try {
             instance.close();
         } catch (IOException e) {
             // handleBy
+        } finally {
+            status = State.INACTIVE;
         }
     }
 

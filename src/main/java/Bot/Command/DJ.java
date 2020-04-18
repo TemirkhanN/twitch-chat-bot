@@ -62,9 +62,11 @@ public class DJ extends CommandHandler {
                 Track track = getCurrentTrackInfo();
                 if (track != null) {
                     command.getMediator().sendMessage("Сейчас играет: " + track.title);
+                } else {
+                    command.getMediator().sendMessage("Либо twitchdj сейчас не играет, либо нам бессовестно врут.");
                 }
             } catch (CommandFailure e) {
-                command.getMediator().sendMessage("Либо twitchdj сейчас не играет, либо нам бессовестно врут.");
+                command.getMediator().sendMessage("Все пропало шеф! Все, что нажито непосильным трудом: запросы, эхсепшоны, тян в высоких чулках. И музыка, кажется, тоже.");
             }
         }
     }
