@@ -25,6 +25,9 @@ public class SoundReaction extends CommandHandler {
         reactions.put("брух", "bruh"); reactions.put("bruh", "bruh");
         reactions.put("nani", "nani"); reactions.put("нани", "nani"); reactions.put("omae wa mou shindeiru", "nani");
         reactions.put("fukdup", "fukdup"); reactions.put("wasted", "fukdup"); reactions.put("гг", "fukdup");
+        reactions.put("бадум", "badumtss"); reactions.put("badum", "badumtss");
+        reactions.put("медик", "medic"); reactions.put("medic", "medic");
+        reactions.put("ретард", "retardalert"); reactions.put("retard", "retardalert");
 
         // Emotion based
         reactions.put("wutface", "wtfit");
