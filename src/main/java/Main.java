@@ -9,7 +9,6 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -29,6 +28,7 @@ public class Main extends Application {
         String authToken;
         int djChannel = -1;
         String djToken = "";
+        ArrayList<String> modules = new ArrayList<>();
     }
 
     private Config config = new Config();
@@ -61,11 +61,9 @@ public class Main extends Application {
             errorText.setFill(Color.FIREBRICK);
             add(errorText, 1, 5);
 
-            add(
-                    createConfigLoadButton(window, channelNameInput, botNameInput, tokenInput, errorText),
-                    0,
-                    4
-            );
+            createConfigLoadButton(window, channelNameInput, botNameInput, tokenInput, errorText);
+
+            createModuleSelectors();
 
             Button btn = new Button();
             btn.setText("Connect");
@@ -113,10 +111,10 @@ public class Main extends Application {
                     errorText.setText(e.getMessage());
                 }
             });
-            add(btn, 0, 6);
+            add(btn, 0, 9);
         }
 
-        private Node createConfigLoadButton(Stage window, TextField channel, TextField bot, TextField authToken, Text errorField) {
+        private void createConfigLoadButton(Stage window, TextField channel, TextField bot, TextField authToken, Text errorField) {
             FileChooser configLoader = new FileChooser();
             configLoader.getExtensionFilters().add(new FileChooser.ExtensionFilter("Ext", "*.json"));
             final Button openButton = new Button("Load config from file");
@@ -139,7 +137,44 @@ public class Main extends Application {
                     }
             );
 
-            return openButton;
+            add(openButton, 0, 4);
+        }
+
+        private void createModuleSelectors() {
+            // TODO Duplicates and literals should be replaced
+            CheckBox soundReaction = new CheckBox("Sound reactions");
+            soundReaction.selectedProperty().addListener((ov, old_val, new_val) -> {
+                if (new_val && !old_val) {
+                    config.modules.add("SoundReaction");
+                } else {
+                    config.modules.remove("SoundReaction");
+                }
+            });
+
+            CheckBox rouletteGame = new CheckBox("Roulette game");
+            rouletteGame.selectedProperty().addListener((ov, old_val, new_val) -> {
+                if (new_val && !old_val) {
+                    config.modules.add("RussianRoulette");
+                } else {
+                    config.modules.remove("RussianRoulette");
+                }
+            });
+
+            CheckBox twitchDj = new CheckBox("TwitchDJ");
+            twitchDj.selectedProperty().addListener((ov, old_val, new_val) -> {
+                if (new_val && !old_val) {
+                    config.modules.add("TwitchDJ");
+                } else {
+                    config.modules.remove("TwitchDJ");
+                }
+            });
+
+            soundReaction.setSelected(true);
+            rouletteGame.setSelected(true);
+            twitchDj.setSelected(true);
+            add(soundReaction, 0, 6);
+            add(rouletteGame, 0, 7);
+            add(twitchDj, 0, 8);
         }
     }
 
@@ -177,9 +212,17 @@ public class Main extends Application {
         chatBot.setLogger(logger);
 
         // Register chat commands handlers
-        chatBot.addChatHandler(new SoundReaction());
-        chatBot.addChatHandler(new RussianRoulette());
-        chatBot.addChatHandler(new DJ(config.djChannel, config.djToken));
+        if (config.modules.contains("SoundReaction")) {
+            chatBot.addChatHandler(new SoundReaction());
+        }
+
+        if (config.modules.contains("RussianRoulette")) {
+            chatBot.addChatHandler(new RussianRoulette());
+        }
+
+        if (config.modules.contains("TwitchDJ")) {
+            chatBot.addChatHandler(new DJ(config.djChannel, config.djToken));
+        }
 
         Question question = new Question();
         question.addAnswer("!tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
