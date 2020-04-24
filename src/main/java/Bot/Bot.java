@@ -63,13 +63,13 @@ public class Bot  extends User {
         logger = null;
     }
 
-    public void addAnnouncement(String text) {
-        singleTimeAnnouncements.add(new Announcement(text, this));
-    }
-
     public void addAnnouncement(String text, int everyNMinitues) {
         try {
-            repeatingAnnouncements.add(new Announcement(text, this, everyNMinitues));
+            if (everyNMinitues == 0) {
+                singleTimeAnnouncements.add(new Announcement(text, this));
+            } else {
+                repeatingAnnouncements.add(new Announcement(text, this, everyNMinitues));
+            }
         } catch (Exception e) {
             // TODO
         }

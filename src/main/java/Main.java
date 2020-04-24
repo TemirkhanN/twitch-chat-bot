@@ -1,9 +1,11 @@
 import Bot.Bot;
 import Bot.Command.*;
+import GUI.AnnouncementText;
 import Util.Logger.AggregatedLogger;
 import Util.Logger.FileLogger;
 import Util.Logger.Logger;
 import com.google.gson.Gson;
+import com.sun.javafx.scene.control.IntegerField;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -11,6 +13,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -20,6 +23,10 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
     public class Config {
@@ -29,6 +36,7 @@ public class Main extends Application {
         int djChannel = -1;
         String djToken = "";
         ArrayList<String> modules = new ArrayList<>();
+        HashMap<Integer, AnnouncementText> announcements = new HashMap<>();
     }
 
     private Config config = new Config();
@@ -39,31 +47,45 @@ public class Main extends Application {
         SetupPane(Stage window) {
             super();
 
+            AtomicInteger row = new AtomicInteger(1);
             setAlignment(Pos.CENTER);
             setHgap(10);
             setVgap(10);
             setPadding(new Insets(25, 25, 25, 25));
 
-            add(new Label("Bot name"), 0, 1);
+            add(new Label("Bot name"), 0, row.get());
             TextField botNameInput =  new TextField();
-            add(botNameInput, 1, 1);
+            botNameInput.setPromptText("TwitchName");
+            add(botNameInput, 1, row.getAndIncrement());
 
-            add(new Label("Token"), 0, 2);
+            add(new Label("Token"), 0, row.get());
             PasswordField tokenInput = new PasswordField();
-            add(tokenInput, 1, 2);
+            tokenInput.setPromptText("2zxgw4n3cfqwerty33ytrewqqwerty");
+            add(tokenInput, 1, row.getAndIncrement());
 
-            add(new Label("Channel name"), 0, 3);
+            add(new Label("Channel name"), 0, row.get());
             TextField channelNameInput = new TextField();
-            add(channelNameInput, 1, 3);
+            channelNameInput.setPromptText("TwitchChannelName");
+            add(channelNameInput, 1, row.getAndIncrement());
 
             Text errorText = new Text();
             errorText.setWrappingWidth(150);
             errorText.setFill(Color.FIREBRICK);
-            add(errorText, 1, 5);
+            add(errorText, 1, row.getAndIncrement());
 
-            createConfigLoadButton(window, channelNameInput, botNameInput, tokenInput, errorText);
-
-            createModuleSelectors();
+            add(createAnnouncementPane(), 0, row.getAndIncrement(), 2, 1);
+            createModuleSelectors().forEach(moduleSelector -> add(moduleSelector, 0, row.getAndIncrement()));
+            add(
+                    createConfigLoadButton(
+                        window,
+                        channelNameInput,
+                        botNameInput,
+                        tokenInput,
+                        errorText
+                    ),
+                    0,
+                    row.getAndIncrement()
+            );
 
             Button btn = new Button();
             btn.setText("Connect");
@@ -111,10 +133,10 @@ public class Main extends Application {
                     errorText.setText(e.getMessage());
                 }
             });
-            add(btn, 0, 9);
+            add(btn, 0, row.getAndIncrement());
         }
 
-        private void createConfigLoadButton(Stage window, TextField channel, TextField bot, TextField authToken, Text errorField) {
+        private Button createConfigLoadButton(Stage window, TextField channel, TextField bot, TextField authToken, Text errorField) {
             FileChooser configLoader = new FileChooser();
             configLoader.getExtensionFilters().add(new FileChooser.ExtensionFilter("Ext", "*.json"));
             final Button openButton = new Button("Load config from file");
@@ -137,10 +159,10 @@ public class Main extends Application {
                     }
             );
 
-            add(openButton, 0, 4);
+            return openButton;
         }
 
-        private void createModuleSelectors() {
+        private Collection<CheckBox> createModuleSelectors() {
             // TODO Duplicates and literals should be replaced
             CheckBox soundReaction = new CheckBox("Sound reactions");
             soundReaction.selectedProperty().addListener((ov, old_val, new_val) -> {
@@ -172,9 +194,77 @@ public class Main extends Application {
             soundReaction.setSelected(true);
             rouletteGame.setSelected(true);
             twitchDj.setSelected(true);
-            add(soundReaction, 0, 6);
-            add(rouletteGame, 0, 7);
-            add(twitchDj, 0, 8);
+
+            return Arrays.asList(soundReaction, rouletteGame, twitchDj);
+        }
+
+        private GridPane createAnnouncementPane() {
+            AtomicInteger row = new AtomicInteger(0);
+
+            GridPane announcementPane = new GridPane();
+            announcementPane.setVgap(2);
+            announcementPane.setHgap(2);
+            final Insets padding = new Insets(0, 5, 25, 10);
+            announcementPane.setPadding(padding);
+            announcementPane.setStyle(
+                    "-fx-border-color: gray;\n" +
+                    "-fx-border-width: 1;\n" +
+                    "-fx-border-style: dashed;\n"
+            );
+
+            ColumnConstraints col1Constraints = new ColumnConstraints();
+            col1Constraints.setPercentWidth(80);
+            ColumnConstraints col2Constraints = new ColumnConstraints();
+            col2Constraints.setPercentWidth(10);
+            ColumnConstraints col3Constraints = new ColumnConstraints();
+            col3Constraints.setPercentWidth(10);
+            announcementPane.getColumnConstraints().addAll(col1Constraints, col2Constraints, col3Constraints);
+
+            int headersRow = row.getAndIncrement();
+            announcementPane.add(new Label("Text"), 0, headersRow);
+            announcementPane.add(new Label("Freq."), 1, headersRow);
+
+            final Button newAnnouncementButton = new Button("New");
+            newAnnouncementButton.setOnAction(
+                    event -> {
+                        int rowPosition = row.getAndIncrement();
+                        TextField announcementInput = new TextField();
+                        announcementInput.setPromptText("Write announcement text");
+                        IntegerField frequencyInput = new IntegerField();
+
+                        announcementInput.textProperty().addListener((observable, oldValue, newValue) -> {
+                            if (newValue.isEmpty()) {
+                                config.announcements.remove(rowPosition);
+                            } else {
+                                config.announcements.put(rowPosition, new AnnouncementText(newValue, frequencyInput.getValue()));
+                            }
+                        });
+
+                        frequencyInput.valueProperty().addListener((observable, oldValue, newValue) -> {
+                            config.announcements.put(rowPosition, new AnnouncementText(announcementInput.getText(), newValue.intValue()));
+                        });
+
+                        announcementPane.add(announcementInput, 0, rowPosition);
+                        announcementPane.add(frequencyInput, 1, rowPosition);
+                        final Button removalButton = new Button("-");
+                        removalButton.setOnAction(
+                                e -> {
+                                    announcementPane.getChildren().removeAll(announcementInput, removalButton, frequencyInput);
+                                    config.announcements.remove(rowPosition);
+                                }
+                        );
+                        announcementPane.add(removalButton, 2, rowPosition);
+
+                        GridPane.setRowIndex(newAnnouncementButton, row.getAndIncrement());
+                    }
+            );
+
+            Label label = new Label("Announcements");
+            label.setStyle("-fx-padding: 5 0 25 0;");
+            announcementPane.add(label, 0, row.getAndIncrement());
+            announcementPane.add(newAnnouncementButton, 0, row.getAndIncrement());
+
+            return announcementPane;
         }
     }
 
@@ -194,7 +284,7 @@ public class Main extends Application {
 
         @Override
         public void log(String message) {
-            Platform.runLater(() -> logBox.setText(logBox.getText() + "\r\n" + message));
+            Platform.runLater(() -> logBox.setText(message + "\r\n" + logBox.getText()));
         }
     }
 
@@ -227,14 +317,12 @@ public class Main extends Application {
         Question question = new Question();
         question.addAnswer("!tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
         question.addAnswer("!vk", "Паблик https://vk.com/project_kaom");
-        question.addAnswer("!youtube", "Канал https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
-        question.addAnswer("!whoami", "https://github.com/Project-Kaom/twitch-community-awards/blob/master/achievements.md#" + Question.PLACEHOLDER_SENDER_NAME);
+        question.addAnswer("!ds", "Дискорд https://discord.gg/tXu6Cze");
+        question.addAnswer("!youtube", "Тытруб https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
+        question.addAnswer("!me", "https://github.com/Project-Kaom/twitch-community-awards/blob/master/achievements.md#" + Question.PLACEHOLDER_SENDER_NAME);
         chatBot.addChatHandler(question);
 
-        chatBot.addAnnouncement("Новые звуковые реакции: медик, ретард, бадум", 40);
-        chatBot.addAnnouncement("Чуваки, греки воевали, но демократии нам не досталось, поэтому давайте без грязи - забаню без суда и следствия.", 60);
-        chatBot.addAnnouncement("Аудио-поток регулируется здесь: https://streamdj.ru/c/Project_Kaom", 31);
-        chatBot.addAnnouncement("Новые реакции и идеи для бота можно предложить в https://discord.gg/tXu6Cze", 60);
+        config.announcements.forEach((pos, announcementText) -> chatBot.addAnnouncement(announcementText.getText(), announcementText.getFrequency()));
 
         chatBot.joinChannel(config.channelName);
     }
