@@ -4,6 +4,7 @@ import GUI.AnnouncementText;
 import Util.Logger.AggregatedLogger;
 import Util.Logger.FileLogger;
 import Util.Logger.Logger;
+import Util.Stopwatch;
 import com.google.gson.Gson;
 import com.sun.javafx.scene.control.IntegerField;
 import javafx.application.Application;
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
+    private Stopwatch uptime;
+
     public class Config {
         String channelName;
         String botName;
@@ -314,23 +317,24 @@ public class Main extends Application {
             chatBot.addChatHandler(new DJ(config.djChannel, config.djToken));
         }
 
-        Question question = new Question();
-        question.addAnswer("!tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
-        question.addAnswer("!vk", "Паблик https://vk.com/project_kaom");
-        question.addAnswer("!ds", "Дискорд https://discord.gg/tXu6Cze");
-        question.addAnswer("!youtube", "Тытруб https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
-        question.addAnswer("!me", "https://github.com/Project-Kaom/twitch-community-awards/blob/master/achievements.md#" + Question.PLACEHOLDER_SENDER_NAME);
-        chatBot.addChatHandler(question);
+        chatBot.addChatCommand("tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
+        chatBot.addChatCommand("vk", "Паблик https://vk.com/project_kaom");
+        chatBot.addChatCommand("ds", "Дискорд https://discord.gg/tXu6Cze");
+        chatBot.addChatCommand("youtube", "Тытруб https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
+        chatBot.addChatCommand("me", "https://github.com/Project-Kaom/twitch-community-awards/blob/master/achievements.md#" + Question.PLACEHOLDER_SENDER_NAME);
+        chatBot.addChatCommand("uptime", () -> uptime.toString());
 
         config.announcements.forEach((pos, announcementText) -> chatBot.addAnnouncement(announcementText.getText(), announcementText.getFrequency()));
 
         chatBot.joinChannel(config.channelName);
+        uptime = new Stopwatch();
     }
 
     private void disconnect() {
         if (chatBot != null) {
             chatBot.stop();
             chatBot = null;
+            uptime = null;
         }
     }
 }

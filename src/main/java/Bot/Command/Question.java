@@ -1,17 +1,22 @@
 package Bot.Command;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 public class Question extends CommandHandler {
     public static final String PLACEHOLDER_SENDER_NAME = "%username%";
 
-    private HashMap<String, String> answers;
+    private HashMap<String, Supplier<String>> answers;
 
     public Question() {
         answers = new HashMap<>();
     }
 
     public void addAnswer(String question, String answer) {
+        answers.put(question, () -> answer);
+    }
+
+    public void addAnswer(String question, Supplier<String> answer) {
         answers.put(question, answer);
     }
 
@@ -22,8 +27,7 @@ public class Question extends CommandHandler {
 
     @Override
     protected void run(Command command) {
-        String response = answers.get(command.getCommand());
-
+        String response = answers.get(command.getCommand()).get();
         if (response == null) {
             return;
         }

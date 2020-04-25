@@ -3,6 +3,7 @@ package Bot;
 import Bot.Command.Command;
 import Bot.Command.CommandBus;
 import Bot.Command.CommandHandler;
+import Bot.Command.Question;
 import Util.Logger.Logger;
 
 import java.io.*;
@@ -12,13 +13,16 @@ import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class Bot  extends User {
+    private static final String CHAT_COMMAND_PREFIX = "!";
     private String token;
     private Channel channel;
     private CommandBus commandBus;
     private ArrayList<Announcement> singleTimeAnnouncements;
     private ArrayList<Announcement> repeatingAnnouncements;
+    private Question chatCommandHandler;
 
     // TODO separate into full logger
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -31,6 +35,8 @@ public class Bot  extends User {
         commandBus = new CommandBus();
         singleTimeAnnouncements = new ArrayList<>();
         repeatingAnnouncements = new ArrayList<>();
+        chatCommandHandler = new Question();
+        addChatHandler(chatCommandHandler);
     }
 
     public void setLogger(Logger logWriter) {
@@ -89,6 +95,14 @@ public class Bot  extends User {
 
     public void addChatHandler(CommandHandler handler) {
         commandBus.registerHandler(handler);
+    }
+
+    public void addChatCommand(String command, String response) {
+        chatCommandHandler.addAnswer(CHAT_COMMAND_PREFIX + command, response);
+    }
+
+    public void addChatCommand(String command, Supplier<String> response) {
+        chatCommandHandler.addAnswer(CHAT_COMMAND_PREFIX + command, response);
     }
 
     private void handleAnnouncements() {
