@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
 
 public class DJ extends CommandHandler {
-    private static final String COMMAND_PREFIX = "!dj";
+    private static final String COMMAND_PREFIX = "!music";
     private static final String SKIP_COMMAND = COMMAND_PREFIX + " skip";
-    private static final String TRACK_INFO_COMMAND = COMMAND_PREFIX + " track";
+    private static final String TRACK_INFO_COMMAND = COMMAND_PREFIX + "";
+
+    private int votesRequiredForTrackSkip = 3;
+
+    private HashSet<String> votesForSkip = new HashSet<>();
 
     public class Track {
         int id;
@@ -37,9 +42,15 @@ public class DJ extends CommandHandler {
         this.channelId = channelId;
     }
 
+    public DJ(int channelId, String apiKey, int votesForTrackSkip) {
+        this.apiKey = apiKey;
+        this.channelId = channelId;
+        this.votesRequiredForTrackSkip = votesForTrackSkip;
+    }
+
     @Override
     public boolean supports(Command command) {
-        return command.startsWith(COMMAND_PREFIX + " ");
+        return command.startsWith(COMMAND_PREFIX + " ") || command.getCommand().equals(COMMAND_PREFIX);
     }
 
     @Override
@@ -47,8 +58,10 @@ public class DJ extends CommandHandler {
         String fullCommand = command.getCommand();
         if (fullCommand.equals(SKIP_COMMAND)) {
             try {
-                if (command.getInitiator().getName().toLowerCase().equals("project_kaom")) {
+                votesForSkip.add(command.getInitiator().getName());
+                if (votesForSkip.size() >= votesRequiredForTrackSkip) {
                     skipCurrentTrack();
+                    votesForSkip.clear();
                 }
             } catch (CommandFailure e) {
                 command.getMediator().sendMessage("Не удалось пропустить трек");
@@ -63,7 +76,7 @@ public class DJ extends CommandHandler {
                 if (track != null) {
                     command.getMediator().sendMessage("Сейчас играет: " + track.title);
                 } else {
-                    command.getMediator().sendMessage("Либо twitchdj сейчас не играет, либо нам бессовестно врут.");
+                    command.getMediator().sendMessage("Я не знаю, что сейчас играет");
                 }
             } catch (CommandFailure e) {
                 command.getMediator().sendMessage("Все пропало шеф! Все, что нажито непосильным трудом: запросы, эхсепшоны, тян в высоких чулках. И музыка, кажется, тоже.");

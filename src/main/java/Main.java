@@ -151,13 +151,17 @@ public class Main extends Application {
                         }
 
                         try {
-                            BufferedReader freader = new BufferedReader(new FileReader(file));
-                            Config loadedConfig = (new Gson()).fromJson(freader, Config.class);
-                            channel.setText(loadedConfig.channelName);
-                            bot.setText(loadedConfig.botName);
-                            authToken.setText(loadedConfig.authToken);
+                            FileReader freader = new FileReader(file);
+                            config = (new Gson()).fromJson(freader, Config.class);
+                            normalizeConfig(config);
+                            freader.close();
+                            channel.setText(config.channelName);
+                            bot.setText(config.botName);
+                            authToken.setText(config.authToken);
                         } catch (FileNotFoundException e) {
                             errorField.setText("File not found");
+                        } catch (IOException e) {
+                            System.out.println(e.getMessage());
                         }
                     }
             );
@@ -194,9 +198,9 @@ public class Main extends Application {
                 }
             });
 
-            soundReaction.setSelected(true);
-            rouletteGame.setSelected(true);
-            twitchDj.setSelected(true);
+            soundReaction.setSelected(false);
+            rouletteGame.setSelected(false);
+            twitchDj.setSelected(false);
 
             return Arrays.asList(soundReaction, rouletteGame, twitchDj);
         }
@@ -335,6 +339,16 @@ public class Main extends Application {
             chatBot.stop();
             chatBot = null;
             uptime = null;
+        }
+    }
+
+    private void normalizeConfig(Config config) {
+        if (config.modules == null) {
+            config.modules = new ArrayList<>(0);
+        }
+
+        if (config.announcements == null) {
+            config.announcements = new HashMap<>(0);
         }
     }
 }
