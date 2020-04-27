@@ -36,6 +36,7 @@ For now it is not configurable through GUI. Only import from json file as
 		"mycommand": "Response that is send on command appear in the chat"
     }
 }
+```
 
 For something complicated there is Function based handling. Only hardcode for now.
 For example currently build in !uptime command that shows how long bot is being "online"
@@ -46,6 +47,7 @@ class Main{
         String botName = args[0];
         String authToken = args[1];
         String channelName = args[2]
+	
         bot = new Bot(botName, authToken);
         Stopwatch stopwatch = new Stopwatch();
         chatBot.addChatCommand("uptime", () -> stopwatch.toString());
