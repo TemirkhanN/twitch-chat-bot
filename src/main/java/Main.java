@@ -23,6 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -155,7 +156,7 @@ public class Main extends Application {
                         }
 
                         try {
-                            FileReader freader = new FileReader(file);
+                            FileReader freader = new FileReader(file, Charset.forName("UTF-8"));
                             config = (new Gson()).fromJson(freader, Config.class);
                             normalizeConfig(config);
                             freader.close();
