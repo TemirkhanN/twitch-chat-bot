@@ -32,8 +32,8 @@ For now it is not configurable through GUI. Only import from json file as
 
 ```json
 {
-	"commands": {
-		"mycommand": "Response that is send on command appear in the chat"
+    "commands": {
+        "mycommand": "Response that is send on command appear in the chat"
     }
 }
 ```
