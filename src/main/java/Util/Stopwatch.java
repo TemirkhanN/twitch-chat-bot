@@ -10,7 +10,7 @@ public class Stopwatch {
     private long startTime;
 
     public Stopwatch() {
-        startTime = System.currentTimeMillis() + (14323 * 1000);
+        startTime = System.currentTimeMillis();
     }
 
     private int getPassedTime(Time timeUnit) {
