@@ -43,6 +43,8 @@ public class Main extends Application {
         String djToken = "";
         ArrayList<String> modules = new ArrayList<>();
         HashMap<Integer, AnnouncementText> announcements = new HashMap<>();
+        // TODO GUI for commands input
+        HashMap<String, String> commands = new HashMap<>();
     }
 
     private Config config = new Config();
@@ -326,11 +328,7 @@ public class Main extends Application {
             chatBot.addChatHandler(new DJ(config.djChannel, config.djToken));
         }
 
-        chatBot.addChatCommand("tg stickers", "Стикеры в telegram https://t.me/addstickers/corgioncrack");
-        chatBot.addChatCommand("vk", "Паблик https://vk.com/project_kaom");
-        chatBot.addChatCommand("ds", "Дискорд https://discord.gg/tXu6Cze");
-        chatBot.addChatCommand("youtube", "Тытруб https://www.youtube.com/channel/UC3NAFCI_cje-X5gF6woyADg");
-        chatBot.addChatCommand("me", "https://github.com/Project-Kaom/twitch-community-awards/blob/master/achievements.md#" + Question.PLACEHOLDER_SENDER_NAME);
+        config.commands.forEach((command, response) -> chatBot.addChatCommand(command, response));
         chatBot.addChatCommand("uptime", () -> uptime.toString());
 
         config.announcements.forEach((pos, announcementText) -> chatBot.addAnnouncement(announcementText.getText(), announcementText.getFrequency()));
@@ -354,6 +352,10 @@ public class Main extends Application {
 
         if (config.announcements == null) {
             config.announcements = new HashMap<>(0);
+        }
+
+        if (config.commands == null) {
+            config.commands = new HashMap<>();
         }
     }
 }
