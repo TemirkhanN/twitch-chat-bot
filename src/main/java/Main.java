@@ -23,6 +23,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -125,10 +127,12 @@ public class Main extends Application {
                 try {
                     if (chatBot == null) {
                         LogPane logPane = new LogPane(500, 400);
-                        window.setScene(new Scene(new FlowPane(Orientation.VERTICAL, 10, 10, logPane), 800, 600));
-                        Logger fileLogger = new FileLogger(System.getProperty("user.dir") + "/chat-bot-log.txt");
+                        Logger fileLogger = new FileLogger(
+                                System.getProperty("user.dir") + "/" +  LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "chat-bot-log.txt"
+                        );
 
                         connect(new AggregatedLogger(logPane, fileLogger), config);
+                        window.setScene(new Scene(new FlowPane(Orientation.VERTICAL, 10, 10, logPane), 800, 600));
                     } else {
                         errorText.setText("Already connected");
                     }
