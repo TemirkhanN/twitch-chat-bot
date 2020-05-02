@@ -48,7 +48,7 @@ public class SoundReaction extends CommandHandler {
         reactions.put("ohuenno", "hidden/prosto-ohuenno");
 
         //individual
-        reactions.put("slave", "individual/laddrussoo/gachslaves");
+        reactions.put("slave", "individual/zenrays/gachslaves");
     }
 
     public boolean supports(Command command) {
