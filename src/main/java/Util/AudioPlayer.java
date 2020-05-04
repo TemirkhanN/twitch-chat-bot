@@ -5,16 +5,16 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 
 public class AudioPlayer {
-    private Clip player;
+    private Clip clip;
 
     private static AudioPlayer instance;
 
     private AudioPlayer() {
         try {
-            player = AudioSystem.getClip();
-            player.addLineListener(event -> {
+            clip = AudioSystem.getClip();
+            clip.addLineListener(event -> {
                 if (event.getType() == LineEvent.Type.STOP) {
-                    player.close();
+                    clip.close();
                 }
             });
         } catch (LineUnavailableException e) {
@@ -31,8 +31,7 @@ public class AudioPlayer {
     }
 
     public void play(String audioFile) {
-        // No audio intersection
-        if (player.isRunning()) {
+        if (clip.isRunning()) {
             return;
         }
 
@@ -43,12 +42,14 @@ public class AudioPlayer {
 
         try {
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(fileStream));
-            player.open(inputStream);
-            player.setFramePosition(0);
-            player.start();
+            clip.open(inputStream);
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl.setValue(gainControl.getMaximum());
+            clip.setFramePosition(0);
+            clip.start();
         } catch (Exception error) {
             // TODO
-            player.close();
+            clip.close();
             throw new RuntimeException("Audio playing failure", error);
         }
     }
