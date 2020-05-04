@@ -10,12 +10,13 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-public class Bot  extends User {
+public class Bot extends User {
     private static final String CHAT_COMMAND_PREFIX = "!";
     private String token;
     private Channel channel;
@@ -98,6 +99,17 @@ public class Bot  extends User {
     }
 
     public void addChatCommand(String command, String response) {
+        // TODO internal syntax parser
+        if (response.matches("^random\\(([^|]+\\|[^|]+)+\\)$")) {
+            String[] responses = response.substring(7, response.length() - 1).split("\\|");
+            chatCommandHandler.addAnswer(
+                    CHAT_COMMAND_PREFIX + command,
+                    () -> responses[(new Random()).nextInt(responses.length)]
+            );
+
+            return;
+        }
+
         chatCommandHandler.addAnswer(CHAT_COMMAND_PREFIX + command, response);
     }
 
