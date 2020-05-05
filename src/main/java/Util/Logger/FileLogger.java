@@ -25,7 +25,16 @@ public class FileLogger implements Logger {
             logWriter.write(message);
             logWriter.flush();
         } catch (IOException e) {
-            // TODO
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            logWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

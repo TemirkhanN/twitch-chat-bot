@@ -67,7 +67,8 @@ public class Bot extends User {
         }
 
         channel.leave();
-        logger = null;
+        channel = null;
+        logger.close();
     }
 
     public void addAnnouncement(String text, int everyNMinitues) {

@@ -1,5 +1,6 @@
 package Util.Logger;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class AggregatedLogger implements Logger{
@@ -7,13 +8,16 @@ public class AggregatedLogger implements Logger{
 
     public AggregatedLogger(Logger... loggers) {
         this.loggers = new LinkedList<>();
-        for (Logger logger:loggers) {
-            this.loggers.add(logger);
-        }
+        this.loggers.addAll(Arrays.asList(loggers));
     }
 
     @Override
     public void log(String message) {
-        loggers.forEach(msg -> msg.log(message));
+        loggers.forEach(logger -> logger.log(message));
+    }
+
+    @Override
+    public void close() {
+        loggers.forEach(Logger::close);
     }
 }

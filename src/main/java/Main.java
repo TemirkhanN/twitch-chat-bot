@@ -285,6 +285,8 @@ public class Main extends Application {
     final class LogPane extends ScrollPane implements Logger {
         private Label logBox;
 
+        private boolean isActive;
+
         LogPane(double width, double height) {
             super();
 
@@ -294,11 +296,21 @@ public class Main extends Application {
 
             logBox = new Label();
             setContent(logBox);
+            isActive = true;
         }
 
         @Override
         public void log(String message) {
+            if (!isActive) {
+                return;
+            }
+
             Platform.runLater(() -> logBox.setText(message + "\r\n" + logBox.getText()));
+        }
+
+        @Override
+        public void close() {
+            isActive = false;
         }
     }
 
@@ -338,11 +350,12 @@ public class Main extends Application {
     }
 
     private void disconnect() {
-        if (chatBot != null) {
-            chatBot.stop();
-            chatBot = null;
-            uptime = null;
+        if (chatBot == null) {
+            return;
         }
+
+        chatBot.stop();
+        System.exit(0);
     }
 
     private void normalizeConfig(Config config) {
