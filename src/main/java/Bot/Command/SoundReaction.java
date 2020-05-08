@@ -44,8 +44,6 @@ public class SoundReaction extends CommandHandler {
         reactions.put("ненене", "hidden/nononono");
         reactions.put("flick", "hidden/ricardo");
         reactions.put("suffer", "hidden/rice-fields");
-        reactions.put("estestvenno", "hidden/estestvenno");
-        reactions.put("ohuenno", "hidden/prosto-ohuenno");
 
         //individual
         reactions.put("slaves", "individual/zenrays/gachslaves");
