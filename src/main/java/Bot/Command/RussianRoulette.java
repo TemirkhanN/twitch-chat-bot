@@ -127,7 +127,6 @@ public class RussianRoulette extends CommandHandler {
             }
 
             game.disqualify(currentTurnBelongsTo);
-            currentTurnTime.reset();
         }
 
         Turn turn;
@@ -153,5 +152,6 @@ public class RussianRoulette extends CommandHandler {
         }
 
         mediator.sendMessage(message);
+        currentTurnTime.reset();
     }
 }
