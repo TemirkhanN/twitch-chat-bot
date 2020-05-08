@@ -87,6 +87,10 @@ public class Roulette {
         return Turn.unlucky(currentPlayer.getName());
     }
 
+    public void disqualify(Player player) {
+        player.lose();
+    }
+
     public Player getCurrentPlayer() {
         if (players.size() == 0) {
             return null;

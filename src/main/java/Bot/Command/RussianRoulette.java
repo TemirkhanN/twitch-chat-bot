@@ -5,6 +5,7 @@ import Game.GameException;
 import Game.Player;
 import Game.Roulette;
 import Game.Turn;
+import Util.Stopwatch;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,6 +19,8 @@ public class RussianRoulette extends CommandHandler {
     private static Roulette game;
 
     private final static ScheduledExecutorService lobbyTimer = Executors.newScheduledThreadPool(1);
+
+    private Stopwatch currentTurnTime = new Stopwatch();
 
     @Override
     public boolean supports(Command command) {
@@ -70,6 +73,7 @@ public class RussianRoulette extends CommandHandler {
             try {
                 game.start();
                 mediator.sendMessage("Игра началась! @" + game.getCurrentPlayer().getName() + " ты начинаешь.");
+                currentTurnTime.reset();
             } catch (GameException err) {
                 game = null;
                 if (err.getCode() == GameException.CODE_NOT_ENOUGH_PLAYERS) {
@@ -116,9 +120,14 @@ public class RussianRoulette extends CommandHandler {
 
         Player currentTurnBelongsTo = game.getCurrentPlayer();
         if (!player.equals(currentTurnBelongsTo)) {
-            mediator.whisper(player.getName(), "сейчас не твой ход");
+            if (!currentTurnTime.isTimePassed(120)) {
+                mediator.whisper(player.getName(), "сейчас не твой ход");
 
-            return;
+                return;
+            }
+
+            game.disqualify(currentTurnBelongsTo);
+            currentTurnTime.reset();
         }
 
         Turn turn;
@@ -126,6 +135,7 @@ public class RussianRoulette extends CommandHandler {
             turn = game.takeTurn();
         } catch (GameException e) {
             mediator.whisper(player.getName(), "ты не должен сейчас этого делать");
+
             return;
         }
 

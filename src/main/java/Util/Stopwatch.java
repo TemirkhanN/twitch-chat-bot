@@ -13,6 +13,14 @@ public class Stopwatch {
         startTime = System.currentTimeMillis();
     }
 
+    public void reset() {
+        startTime = System.currentTimeMillis();
+    }
+
+    public boolean isTimePassed(int seconds) {
+        return getPassedTime(Time.SECOND) >= seconds;
+    }
+
     private int getPassedTime(Time timeUnit) {
         float divider;
         switch(timeUnit) {

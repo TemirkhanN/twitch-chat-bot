@@ -145,6 +145,29 @@ class RouletteTest {
         }
     }
 
+    @Test
+    public void testDisqualification() {
+        Player bill = createPlayer("Bill");
+        Player john = createPlayer("John");
+        Player emily = createPlayer("Emily");
+
+        assertDoesNotThrow(() -> {
+            roulette.join(bill);
+            roulette.join(john);
+            roulette.join(emily);
+            roulette.start();
+        });
+
+
+        assertDoesNotThrow(() -> {
+            roulette.disqualify(john);
+            // Bill takes turn
+            roulette.takeTurn();
+        });
+
+        assertTrue(roulette.getCurrentPlayer().equals(emily));
+    }
+
     private Player createPlayer(String name) {
         return new Player(name);
     }
