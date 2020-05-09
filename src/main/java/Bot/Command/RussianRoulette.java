@@ -126,6 +126,7 @@ public class RussianRoulette extends CommandHandler {
                 return;
             }
 
+            mediator.sendMessage(currentTurnBelongsTo.getName() + " исключен за бездействие.");
             game.disqualify(currentTurnBelongsTo);
         }
 
