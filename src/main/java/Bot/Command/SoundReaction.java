@@ -47,6 +47,7 @@ public class SoundReaction extends CommandHandler {
 
         //individual
         reactions.put("slaves", "individual/zenrays/gachslaves");
+        reactions.put("курва", "individual/duue88d7d/okurwa");
     }
 
     public boolean supports(Command command) {
