@@ -1,5 +1,6 @@
 import Bot.Bot;
 import Bot.Command.*;
+import Community.Giveaway.Giveaway;
 import GUI.AnnouncementText;
 import Util.Logger.AggregatedLogger;
 import Util.Logger.FileLogger;
@@ -42,6 +43,7 @@ public class Main extends Application {
         int djChannel = -1;
         String djToken = "";
         ArrayList<String> modules = new ArrayList<>();
+        ArrayList<String> giveawayItems = new ArrayList<>();
         HashMap<Integer, AnnouncementText> announcements = new HashMap<>();
         // TODO GUI for commands input
         HashMap<String, String> commands = new HashMap<>();
@@ -338,6 +340,15 @@ public class Main extends Application {
 
         if (config.modules.contains("TwitchDJ")) {
             chatBot.addChatHandler(new DJ(config.djChannel, config.djToken));
+        }
+
+        if (config.giveawayItems.size() > 0) {
+            chatBot.addChatHandler(
+                    new GiveawayHandler(
+                            "!шапки",
+                            new Giveaway(new ArrayList<>(config.giveawayItems))
+                    )
+            );
         }
 
         config.commands.forEach((command, response) -> chatBot.addChatCommand(command, response));

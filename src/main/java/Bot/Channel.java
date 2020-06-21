@@ -72,4 +72,8 @@ public class Channel {
 
         return message;
     }
+
+    public String getName() {
+        return name;
+    }
 }

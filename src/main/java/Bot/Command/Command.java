@@ -30,4 +30,8 @@ public class Command {
     public Bot getMediator() {
         return mediator;
     }
+    
+    public boolean isInitiatedByAdmin() {
+        return initiator.getName().equals(mediator.getCurrentChannelName());
+    }
 }

@@ -61,6 +61,14 @@ public class Bot extends User {
         listenToChat();
     }
 
+    public String getCurrentChannelName() {
+        if (channel == null) {
+            return null;
+        }
+
+        return channel.getName();
+    }
+
     public void stop() {
         if (channel == null) {
             return;
