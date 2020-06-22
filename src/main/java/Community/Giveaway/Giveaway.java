@@ -20,6 +20,10 @@ public class Giveaway {
     }
 
     public void addParticipant(String participant) {
+        if (isOver()) {
+            return;
+        }
+
         participants.add(participant);
     }
 
@@ -32,6 +36,10 @@ public class Giveaway {
     }
 
     public void startGiveaway() throws LogicException {
+        if (isOver()) {
+            throw new LogicException("Эта раздача уже завершена");
+        }
+
         if (participants.size() == 0) {
             throw new LogicException("Недостаточно участников для начала раздачи");
         }

@@ -37,6 +37,8 @@ public class GiveawayHandler extends CommandHandler {
     protected void run(Command command) {
         if (giveaway.isOver()) {
             command.getMediator().sendMessage("Раздача завершена.");
+
+            return;
         }
 
         if (isParticipationCommand(command)) {
