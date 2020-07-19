@@ -15,6 +15,7 @@ public class DJ extends CommandHandler {
     private static final String TRACK_INFO_COMMAND = COMMAND_PREFIX + "";
 
     private int votesRequiredForTrackSkip = 3;
+    private String currentTrackName = "";
 
     private HashSet<String> votesForSkip = new HashSet<>();
 
@@ -58,6 +59,12 @@ public class DJ extends CommandHandler {
         String fullCommand = command.getCommand();
         if (fullCommand.equals(SKIP_COMMAND)) {
             try {
+                Track currentTrack = getCurrentTrackInfo();
+                if (!currentTrackName.equals(currentTrack.title)) {
+                    currentTrackName = currentTrack.title;
+                    votesForSkip.clear();
+                }
+
                 votesForSkip.add(command.getInitiator().getName());
                 if (votesForSkip.size() >= votesRequiredForTrackSkip) {
                     skipCurrentTrack();
