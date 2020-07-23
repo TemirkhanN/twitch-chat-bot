@@ -58,10 +58,10 @@ public class SoundReaction extends CommandHandler {
             return false;
         }
 
-        return isAllowedToUseReaction(command.getInitiator().getName(), reactionName);
+        return isAllowedToUseReaction(command.getInitiator(), reactionName);
     }
 
-    protected void run(Command command) {
+    protected void run(Command command, OutputInterface output) {
         playReaction(command.getCommand().toLowerCase());
     }
 
@@ -104,14 +104,15 @@ public class SoundReaction extends CommandHandler {
 
     private boolean isAllowedToUseReaction(String user, String reaction) {
         String reactionFilePath = getReactionSoundPath(reaction);
+        if (reactionFilePath == null) {
+            return false;
+        }
+
         if (reactionFilePath.contains("individual/" + user.toLowerCase() + "/")) {
             return true;
         }
 
-        if (!reactionFilePath.contains("individual/")) {
-            return true;
-        }
+        return !reactionFilePath.contains("individual/");
 
-        return false;
     }
 }

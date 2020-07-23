@@ -1,7 +1,5 @@
 package Bot.Command;
 
-import Bot.Bot;
-import Bot.User;
 import Community.Giveaway.Giveaway;
 import Community.Giveaway.LogicException;
 
@@ -26,46 +24,40 @@ public class GiveawayHandler extends CommandHandler {
             return true;
         }
 
-        if (isGiveawayStartCommand(command)) {
-            return true;
-        }
+        return isGiveawayStartCommand(command);
 
-        return false;
     }
 
     @Override
-    protected void run(Command command) {
+    protected void run(Command command, OutputInterface output) {
         if (giveaway.isOver()) {
-            command.getMediator().sendMessage("Раздача завершена.");
+            output.write("Раздача завершена.");
 
             return;
         }
 
         if (isParticipationCommand(command)) {
-            participate(command.getInitiator(), command.getMediator());
-
-            return;
+            participate(command.getInitiator(), output);
         }
 
         if (isParticipantListCommand(command)) {
-            command.getMediator().sendMessage("Список участников: " + giveaway.getParticipants().toString());
+            output.write("Список участников: " + giveaway.getParticipants().toString());
 
             return;
         }
 
         if (isGiveawayStartCommand(command) && command.isInitiatedByAdmin()) {
-            startGiveaway(command);
+            startGiveaway(output);
 
             return;
         }
     }
 
-    private void startGiveaway(Command command) {
-        Bot mediator = command.getMediator();
+    private void startGiveaway(OutputInterface output) {
         try {
             giveaway.startGiveaway();
         } catch (LogicException e) {
-            mediator.sendMessage(e.getMessage());
+            output.write(e.getMessage());
 
             return;
         }
@@ -78,19 +70,18 @@ public class GiveawayHandler extends CommandHandler {
             giveawayResult.append("; ");
         });
 
-        mediator.sendMessage(giveawayResult.toString());
+        output.write(giveawayResult.toString());
     }
 
-    private void participate(User user, Bot mediator) {
-        String participant = user.getName();
+    private void participate(String participant, OutputInterface output) {
         if (giveaway.hasParticipant(participant)) {
-            mediator.whisper(user, "ты уже принимаешь участи в раздаче.");
+            output.write(participant + " ты уже принимаешь участи в раздаче.");
 
             return;
         }
 
         giveaway.addParticipant(participant);
-        mediator.whisper(user, "вступает в раздачу.");
+        output.write(participant + "вступает в раздачу.");
     }
 
     private boolean isParticipationCommand(Command command) {

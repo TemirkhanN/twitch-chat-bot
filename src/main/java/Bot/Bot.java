@@ -1,9 +1,6 @@
 package Bot;
 
-import Bot.Command.Command;
-import Bot.Command.CommandBus;
-import Bot.Command.CommandHandler;
-import Bot.Command.Question;
+import Bot.Command.*;
 import Util.Logger.Logger;
 
 import java.io.*;
@@ -16,7 +13,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-public class Bot extends User {
+public class Bot extends User implements OutputInterface {
     private static final String CHAT_COMMAND_PREFIX = "!";
     private String token;
     private Channel channel;
@@ -30,7 +27,7 @@ public class Bot extends User {
     private Logger logger;
 
     public Bot(String name, String token) {
-        super(name);
+        super(name, true);
 
         this.token = token;
         commandBus = new CommandBus();
@@ -61,14 +58,6 @@ public class Bot extends User {
         listenToChat();
     }
 
-    public String getCurrentChannelName() {
-        if (channel == null) {
-            return null;
-        }
-
-        return channel.getName();
-    }
-
     public void stop() {
         if (channel == null) {
             return;
@@ -95,14 +84,6 @@ public class Bot extends User {
         channel.sendMessage(message);
     }
 
-    public void whisper(User to, String message) {
-        channel.sendMessage("@" + to.getName() + ", " + message);
-    }
-
-    public void whisper(String to, String message) {
-        channel.sendMessage("@" + to + ", " + message);
-    }
-
     public void addChatHandler(CommandHandler handler) {
         commandBus.registerHandler(handler);
     }
@@ -126,6 +107,15 @@ public class Bot extends User {
         chatCommandHandler.addAnswer(CHAT_COMMAND_PREFIX + command, response);
     }
 
+    @Override
+    public void write(String message) {
+        if (channel == null) {
+            throw new RuntimeException("Bot can not write messages while not connected");
+        }
+
+        channel.sendMessage(message);
+    }
+
     private void handleAnnouncements() {
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(repeatingAnnouncements.size());
         for (Announcement announcement : singleTimeAnnouncements) {
@@ -140,10 +130,10 @@ public class Bot extends User {
 
     private void listenToChat() {
         class ChatCommandHandle implements Runnable {
-            private Bot handler;
+            private OutputInterface outputWriter;
 
-            private ChatCommandHandle(Bot handler) {
-                this.handler = handler;
+            private ChatCommandHandle(OutputInterface outputWriter) {
+                this.outputWriter = outputWriter;
             }
 
             public void run() {
@@ -152,10 +142,9 @@ public class Bot extends User {
                     String command;
                     while ((message = channel.readMessage()) != null) {
                         log(message.toString());
-                        // We don't handle non common messages received in chat
                         command = message.getCommonPart();
                         if (command != null) {
-                            commandBus.execute(new Command(command, message.getSender(), handler));
+                            commandBus.execute(new Command(command, message.getSender()), outputWriter);
                         }
                     }
                 } catch (IOException e) {

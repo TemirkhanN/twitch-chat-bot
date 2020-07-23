@@ -11,15 +11,23 @@ public class Message extends Request{
     private User sender;
 
     private static final Pattern userNamePattern = Pattern.compile(":([^ ]+)?!");
+    private static final Pattern channelOwnerPattern = Pattern.compile("PRIVMSG #([^ ]+)?");
 
     public Message(String rawMessage) {
         super(rawMessage);
 
         parts = rawMessage.split(" ");
 
-        Matcher m = userNamePattern.matcher(toString());
-        if (m.find()) {
-            sender = new User(m.group(1));
+        Matcher nameMatcher         = userNamePattern.matcher(rawMessage);
+        Matcher channelOwnerMatcher = channelOwnerPattern.matcher(rawMessage);
+        if (nameMatcher.find()) {
+            String userName = nameMatcher.group(1);
+            boolean isAdmin = false;
+            if (channelOwnerMatcher.find()) {
+                isAdmin = userName.equals(channelOwnerMatcher.group(1));
+            }
+
+            sender = new User(userName, isAdmin);
         }
     }
 

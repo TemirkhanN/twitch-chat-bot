@@ -1,6 +1,5 @@
 package Bot.Command;
 
-import Bot.Bot;
 import Game.GameException;
 import Game.Player;
 import Game.Roulette;
@@ -33,28 +32,24 @@ public class RussianRoulette extends CommandHandler {
             return true;
         }
 
-        if (commandText.equals(COMMAND_PREFIX)) {
-            return true;
-        }
+        return commandText.equals(COMMAND_PREFIX);
 
-        return false;
     }
 
     @Override
-    protected void run(Command command) {
-        Bot mediator = command.getMediator();
+    protected void run(Command command, OutputInterface output) {
         String commandText = command.getCommand();
-        Player player = new Player(command.getInitiator().getName());
+        Player player = new Player(command.getInitiator());
 
         switch(commandText) {
             case JOIN_COMMAND:
-                joinGame(player, mediator);
+                joinGame(player, output);
                 break;
             case TAKE_TURN_COMMAND:
-                takeTurn(player, mediator);
+                takeTurn(player, output);
                 break;
             default:
-                mediator.sendMessage(getDescription());
+                output.write(getDescription());
                 break;
         }
     }
@@ -63,7 +58,7 @@ public class RussianRoulette extends CommandHandler {
         return "Игра рулетка. Вступить в игру можно командой «!r join». Когда игра начнется, ход делается командой «!r go».";
     }
 
-    private void createNewGame(Bot mediator) {
+    private void createNewGame(OutputInterface output) {
         game = new Roulette();
         lobbyTimer.schedule(()->{
             if (!game.isLookingForPlayers()) {
@@ -72,32 +67,32 @@ public class RussianRoulette extends CommandHandler {
 
             try {
                 game.start();
-                mediator.sendMessage("Игра началась! @" + game.getCurrentPlayer().getName() + " ты начинаешь.");
+                output.write("Игра началась! @" + game.getCurrentPlayer().getName() + " ты начинаешь.");
                 currentTurnTime.reset();
             } catch (GameException err) {
                 game = null;
                 if (err.getCode() == GameException.CODE_NOT_ENOUGH_PLAYERS) {
-                    mediator.sendMessage("Недостаточно игроков для начала игры.");
+                    output.write("Недостаточно игроков для начала игры.");
                 }
             }
         }, 1, TimeUnit.MINUTES);
     }
 
-    private void joinGame(Player player, Bot mediator) {
+    private void joinGame(Player player, OutputInterface output) {
         if (game == null || game.isOver()) {
-            createNewGame(mediator);
+            createNewGame(output);
         }
 
         try {
             game.join(player);
-            mediator.sendMessage("@" + player.getName() + " вступает в игру.");
+            output.write(player.getName() + " вступает в игру.");
         } catch (GameException err) {
             switch(err.getCode()) {
                 case GameException.CODE_PLAYER_ALREADY_JOINED:
-                    mediator.whisper(player.getName(), "ты уже участвуешь в игре.");
+                    output.write(player.getName() + ", ты уже участвуешь в игре.");
                     break;
                 case GameException.CODE_GAME_HAS_ALREADY_STARTED:
-                    mediator.whisper(player.getName(), "игра уже идет.");
+                    output.write(player.getName() + ", игра уже идет.");
                     break;
                 default:
                     System.err.println(err.toString());
@@ -105,15 +100,15 @@ public class RussianRoulette extends CommandHandler {
         }
     }
 
-    private void takeTurn(Player player, Bot mediator) {
+    private void takeTurn(Player player, OutputInterface output) {
         if (game == null || game.isOver()) {
-            mediator.whisper(player.getName(), "Сейчас нет доступных игр. Создай свою командой " + JOIN_COMMAND);
+            output.write(player.getName() + ", сейчас нет доступных игр. Создай свою командой " + JOIN_COMMAND);
 
             return;
         }
 
         if (!game.hasPlayer(player)) {
-            mediator.whisper(player.getName(), "ты не участвуешь в игре");
+            output.write(player.getName() + ", ты не участвуешь в игре");
 
             return;
         }
@@ -121,12 +116,12 @@ public class RussianRoulette extends CommandHandler {
         Player currentTurnBelongsTo = game.getCurrentPlayer();
         if (!player.equals(currentTurnBelongsTo)) {
             if (!currentTurnTime.isTimePassed(120)) {
-                mediator.whisper(player.getName(), "сейчас не твой ход");
+                output.write(player.getName() + ", сейчас не твой ход");
 
                 return;
             }
 
-            mediator.sendMessage(currentTurnBelongsTo.getName() + " исключен за бездействие.");
+            output.write(currentTurnBelongsTo.getName() + " исключен за бездействие.");
             game.disqualify(currentTurnBelongsTo);
         }
 
@@ -134,7 +129,7 @@ public class RussianRoulette extends CommandHandler {
         try {
             turn = game.takeTurn();
         } catch (GameException e) {
-            mediator.whisper(player.getName(), "ты не должен сейчас этого делать");
+            output.write(player.getName() + ", ты не должен сейчас этого делать");
 
             return;
         }
@@ -152,7 +147,7 @@ public class RussianRoulette extends CommandHandler {
             message = "@" + player.getName() + "'у повезло. @" + nextTurnBelongsTo.getName() + " твой черед!";
         }
 
-        mediator.sendMessage(message);
+        output.write(message);
         currentTurnTime.reset();
     }
 }

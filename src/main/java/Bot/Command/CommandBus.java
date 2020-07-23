@@ -11,10 +11,10 @@ public class CommandBus {
         handlers.addLast(handler);
     }
 
-    public void execute(Command command) {
+    public void execute(Command command, OutputInterface output) {
         for(CommandHandler handler: handlers) {
             if (handler.supports(command)) {
-                handler.execute(command);
+                handler.execute(command, output);
 
                 return;
             }

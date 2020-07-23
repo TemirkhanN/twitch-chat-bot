@@ -14,11 +14,8 @@ public class Request {
     }
 
     public boolean isPing() {
-        if (raw.equals("PING :tmi.twitch.tv" + LINE_BREAK)) {
-            return true;
-        }
+        return raw.equals("PING :tmi.twitch.tv" + LINE_BREAK);
 
-        return false;
     }
 
     public String toString() {

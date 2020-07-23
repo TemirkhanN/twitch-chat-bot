@@ -118,12 +118,12 @@ public class Main extends Application {
                 }
 
                 if (errors.size() != 0) {
-                    String errorMessage = "";
+                    StringBuilder errorMessage = new StringBuilder();
                     for (String error: errors) {
-                        errorMessage += "\r\n" + error;
+                        errorMessage.append("\r\n").append(error);
                     }
 
-                    errorText.setText(errorMessage);
+                    errorText.setText(errorMessage.toString());
 
                     return;
                 }
@@ -256,9 +256,12 @@ public class Main extends Application {
                             }
                         });
 
-                        frequencyInput.valueProperty().addListener((observable, oldValue, newValue) -> {
-                            config.announcements.put(rowPosition, new AnnouncementText(announcementInput.getText(), newValue.intValue()));
-                        });
+                        frequencyInput.valueProperty().addListener(
+                                (observable, oldValue, newValue) -> config.announcements.put(
+                                        rowPosition,
+                                        new AnnouncementText(announcementInput.getText(), newValue.intValue())
+                                )
+                        );
 
                         announcementPane.add(announcementInput, 0, rowPosition);
                         announcementPane.add(frequencyInput, 1, rowPosition);

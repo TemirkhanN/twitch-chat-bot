@@ -1,6 +1,5 @@
 package Bot.Command;
 
-import Bot.Bot;
 import Bot.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,25 +46,11 @@ public class SoundReactionTest {
             "bruh"
     })
     public void testSupportedReactions(String reaction) {
-        assertTrue(
-                handler.supports(
-                        new Command(
-                                reaction,
-                                new User("Some User"),
-                                new Bot("Some bot", "Some token")
-                        )
-                )
-        );
+        assertTrue(handler.supports(new Command(reaction, new User("Some User"))));
     }
 
     @Test
     public void testUnsupportedReaction() {
-        assertFalse(handler.supports(
-                new Command(
-                        "Unknown reaction",
-                        new User("Some User"),
-                        new Bot("Some bot", "Some token")
-                )
-        ));
+        assertFalse(handler.supports(new Command("Unknown reaction", new User("Some User"))));
     }
 }

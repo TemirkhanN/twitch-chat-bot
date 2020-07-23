@@ -1,17 +1,14 @@
 package Bot.Command;
 
-import Bot.Bot;
 import Bot.User;
 
 public class Command {
     private String command;
     private User initiator;
-    private Bot mediator;
 
-    public Command(String command, User initiator, Bot mediator) {
-        this.command = command;
+    public Command(String command, User initiator) {
+        this.command   = command;
         this.initiator = initiator;
-        this.mediator = mediator;
     }
 
     public String getCommand() {
@@ -22,16 +19,11 @@ public class Command {
         return command.indexOf(text) == 0;
     }
 
-    public User getInitiator() {
-        return initiator;
-    }
-
-
-    public Bot getMediator() {
-        return mediator;
+    public String getInitiator() {
+        return initiator.getName();
     }
     
     public boolean isInitiatedByAdmin() {
-        return initiator.getName().equals(mediator.getCurrentChannelName());
+        return initiator.isAdmin();
     }
 }

@@ -26,16 +26,16 @@ public class Question extends CommandHandler {
     }
 
     @Override
-    protected void run(Command command) {
+    protected void run(Command command, OutputInterface output) {
         String response = answers.get(command.getCommand()).get();
         if (response == null) {
             return;
         }
 
         if (response.contains(PLACEHOLDER_SENDER_NAME)) {
-            response = response.replaceAll(PLACEHOLDER_SENDER_NAME, command.getInitiator().getName());
+            response = response.replaceAll(PLACEHOLDER_SENDER_NAME, command.getInitiator());
         }
 
-        command.getMediator().sendMessage(response);
+        output.write(response);
     }
 }

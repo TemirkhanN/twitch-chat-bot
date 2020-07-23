@@ -55,7 +55,7 @@ public class DJ extends CommandHandler {
     }
 
     @Override
-    protected void run(Command command) {
+    protected void run(Command command, OutputInterface output) {
         String fullCommand = command.getCommand();
         if (fullCommand.equals(SKIP_COMMAND)) {
             try {
@@ -65,13 +65,13 @@ public class DJ extends CommandHandler {
                     votesForSkip.clear();
                 }
 
-                votesForSkip.add(command.getInitiator().getName());
+                votesForSkip.add(command.getInitiator());
                 if (votesForSkip.size() >= votesRequiredForTrackSkip) {
                     skipCurrentTrack();
                     votesForSkip.clear();
                 }
             } catch (CommandFailure e) {
-                command.getMediator().sendMessage("Не удалось пропустить трек");
+                output.write("Не удалось пропустить трек");
             }
 
             return;
@@ -81,12 +81,12 @@ public class DJ extends CommandHandler {
             try {
                 Track track = getCurrentTrackInfo();
                 if (track != null) {
-                    command.getMediator().sendMessage("Сейчас играет: " + track.title);
+                    output.write("Сейчас играет: " + track.title);
                 } else {
-                    command.getMediator().sendMessage("Я не знаю, что сейчас играет");
+                    output.write("Я не знаю, что сейчас играет");
                 }
             } catch (CommandFailure e) {
-                command.getMediator().sendMessage("Все пропало шеф! Все, что нажито непосильным трудом: запросы, эхсепшоны, тян в высоких чулках. И музыка, кажется, тоже.");
+                output.write(e.getMessage());
             }
         }
     }
