@@ -52,6 +52,8 @@ public class SoundReaction extends CommandHandler {
         reactions.put("gnome", "individual/4t4ri26oo/gnome");
         reactions.put("quack", "individual/4t4ri26oo/quack");
         reactions.put("кря", "individual/4t4ri26oo/quack");
+        reactions.put("power", "individual/4t4ri26oo/power");
+        reactions.put("god", "individual/4t4ri26oo/godlike");
     }
 
     public boolean supports(Command command) {
