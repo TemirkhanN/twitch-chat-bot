@@ -1,6 +1,7 @@
 import Bot.Bot;
 import Bot.Command.*;
 import Community.Giveaway.Giveaway;
+import DJ.Streamdj;
 import GUI.AnnouncementText;
 import Util.Logger.AggregatedLogger;
 import Util.Logger.FileLogger;
@@ -341,9 +342,12 @@ public class Main extends Application {
             chatBot.addChatHandler(new RussianRoulette());
         }
 
+        DJControl djControl = new DJControl();
         if (config.modules.contains("TwitchDJ")) {
-            chatBot.addChatHandler(new DJ(config.djChannel, config.djToken));
+            djControl.addDj(new Streamdj(config.djChannel, config.djToken));
         }
+
+        chatBot.addChatHandler(djControl);
 
         if (config.giveawayItems.size() > 0) {
             chatBot.addChatHandler(
