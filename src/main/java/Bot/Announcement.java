@@ -15,11 +15,11 @@ public class Announcement extends TimerTask {
         frequencyInMinutes = ONE_TIME_ANNOUNCEMENT_FREQUENCY;
     }
 
-    public Announcement(String text, Bot announcer, int frequencyInMinutes) throws Exception {
+    public Announcement(String text, Bot announcer, int frequencyInMinutes) {
         this.text = text;
         this.announcer = announcer;
         if (frequencyInMinutes < MIN_FREQUENCY) {
-            throw new Exception("You can send announcement more often than once in " + MIN_FREQUENCY + " minutes");
+            throw new RuntimeException("You can send announcement more often than once in " + MIN_FREQUENCY + " minutes");
         }
         this.frequencyInMinutes = frequencyInMinutes;
     }
@@ -33,8 +33,7 @@ public class Announcement extends TimerTask {
     }
 
     public void run() {
-        // TODO do we rely on other scheduler class about execution and states?
-        announcer.sendMessage(text);
+        announcer.write(text);
         if (!isRepetitive()) {
             cancel();
         }

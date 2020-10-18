@@ -2,12 +2,12 @@ package Bot;
 
 import Bot.Command.*;
 import Util.Logger.Logger;
+import Util.Stopwatch;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,9 +22,10 @@ public class Bot extends User implements OutputInterface {
     private ArrayList<Announcement> repeatingAnnouncements;
     private Question chatCommandHandler;
 
-    // TODO separate into full logger
-    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private Logger logger;
+
+    private Stopwatch uptime;
 
     public Bot(String name, String token) {
         super(name, true);
@@ -56,6 +57,8 @@ public class Bot extends User implements OutputInterface {
 
         handleAnnouncements();
         listenToChat();
+        uptime = new Stopwatch();
+        addChatCommand("uptime", () -> uptime.toString());
     }
 
     public void stop() {
@@ -63,25 +66,24 @@ public class Bot extends User implements OutputInterface {
             return;
         }
 
+        for (Announcement announcement : repeatingAnnouncements) {
+            announcement.cancel();
+        }
+
         channel.leave();
         channel = null;
-        logger.close();
+        if (logger != null) {
+            logger.close();
+        }
+        uptime = null;
     }
 
     public void addAnnouncement(String text, int everyNMinitues) {
-        try {
-            if (everyNMinitues == 0) {
-                singleTimeAnnouncements.add(new Announcement(text, this));
-            } else {
-                repeatingAnnouncements.add(new Announcement(text, this, everyNMinitues));
-            }
-        } catch (Exception e) {
-            // TODO
+        if (everyNMinitues == 0) {
+            singleTimeAnnouncements.add(new Announcement(text, this));
+        } else {
+            repeatingAnnouncements.add(new Announcement(text, this, everyNMinitues));
         }
-    }
-
-    public void sendMessage(String message) {
-        channel.sendMessage(message);
     }
 
     public void addChatHandler(CommandHandler handler) {
@@ -89,17 +91,6 @@ public class Bot extends User implements OutputInterface {
     }
 
     public void addChatCommand(String command, String response) {
-        // TODO internal syntax parser
-        if (response.matches("^random\\(([^|]+\\|[^|]+)+\\)$")) {
-            String[] responses = response.substring(7, response.length() - 1).split("\\|");
-            chatCommandHandler.addAnswer(
-                    CHAT_COMMAND_PREFIX + command,
-                    () -> responses[(new Random()).nextInt(responses.length)]
-            );
-
-            return;
-        }
-
         chatCommandHandler.addAnswer(CHAT_COMMAND_PREFIX + command, response);
     }
 
@@ -113,6 +104,7 @@ public class Bot extends User implements OutputInterface {
             throw new RuntimeException("Bot can not write messages while not connected");
         }
 
+        log(getName() + " PRIVMSG #"+ channel.getName() + " :" + message);
         channel.sendMessage(message);
     }
 
@@ -140,18 +132,18 @@ public class Bot extends User implements OutputInterface {
                 try {
                     Message message;
                     String command;
-                    while ((message = channel.readMessage()) != null) {
+                    while (channel != null && (message = channel.readMessage()) != null) {
                         log(message.toString());
                         command = message.getCommonPart();
                         if (command != null) {
                             commandBus.execute(new Command(command, message.getSender()), outputWriter);
                         }
                     }
-                } catch (IOException e) {
-                    // TODO
-                    System.err.println(e.toString());
-                } finally {
-                    stop();
+                } catch (IOException|RuntimeException e) {
+                    log(e.toString());
+                    if (channel != null) {
+                        joinChannel(channel.getName());
+                    }
                 }
             }
         }

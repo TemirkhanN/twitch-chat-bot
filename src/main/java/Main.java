@@ -1,12 +1,12 @@
 import Bot.Bot;
 import Bot.Command.*;
 import Community.Giveaway.Giveaway;
+import DJ.Spotify;
 import DJ.Streamdj;
 import GUI.AnnouncementText;
 import Util.Logger.AggregatedLogger;
 import Util.Logger.FileLogger;
 import Util.Logger.Logger;
-import Util.Stopwatch;
 import com.google.gson.Gson;
 import com.sun.javafx.scene.control.IntegerField;
 import javafx.application.Application;
@@ -35,14 +35,15 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
-    private Stopwatch uptime;
-
     public class Config {
         String channelName;
         String botName;
         String authToken;
         int djChannel = -1;
         String djToken = "";
+        String spotifyClientId = "";
+        String spotifyClientSecret = "";
+        String spotifyRefreshToken = "";
         ArrayList<String> modules = new ArrayList<>();
         ArrayList<String> giveawayItems = new ArrayList<>();
         HashMap<Integer, AnnouncementText> announcements = new HashMap<>();
@@ -333,7 +334,6 @@ public class Main extends Application {
         chatBot = new Bot(config.botName, config.authToken);
         chatBot.setLogger(logger);
 
-        // Register chat commands handlers
         if (config.modules.contains("SoundReaction")) {
             chatBot.addChatHandler(new SoundReaction());
         }
@@ -342,29 +342,29 @@ public class Main extends Application {
             chatBot.addChatHandler(new RussianRoulette());
         }
 
-        DJControl djControl = new DJControl();
-        if (config.modules.contains("TwitchDJ")) {
-            djControl.addDj(new Streamdj(config.djChannel, config.djToken));
+        if (config.modules.contains("DJ")) {
+            DJControl djControl = new DJControl();
+
+            if (!config.spotifyClientId.isEmpty()) {
+                djControl.addDj(new Spotify(config.spotifyClientId, config.spotifyClientSecret, config.spotifyRefreshToken));
+            }
+
+            if (config.djChannel != -1) {
+                djControl.addDj(new Streamdj(config.djChannel, config.djToken));
+            }
+
+            chatBot.addChatHandler(djControl);
         }
 
-        chatBot.addChatHandler(djControl);
-
         if (config.giveawayItems.size() > 0) {
-            chatBot.addChatHandler(
-                    new GiveawayHandler(
-                            "!шапки",
-                            new Giveaway(new ArrayList<>(config.giveawayItems))
-                    )
-            );
+            chatBot.addChatHandler(new GiveawayHandler("!шапки", new Giveaway(new ArrayList<>(config.giveawayItems))));
         }
 
         config.commands.forEach((command, response) -> chatBot.addChatCommand(command, response));
-        chatBot.addChatCommand("uptime", () -> uptime.toString());
 
         config.announcements.forEach((pos, announcementText) -> chatBot.addAnnouncement(announcementText.getText(), announcementText.getFrequency()));
 
         chatBot.joinChannel(config.channelName);
-        uptime = new Stopwatch();
     }
 
     private void disconnect() {

@@ -17,13 +17,7 @@ public class Streamdj implements Dj {
     private int channelId;
 
     public class Track {
-        int id;
-        String yid;
         String title;
-        int track_time;
-        String add_time;
-        String start_time;
-        String author;
     }
 
     public class Result {
@@ -42,6 +36,7 @@ public class Streamdj implements Dj {
             BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             try {
                 Track track = (new Gson()).fromJson(rd, Track.class);
+                rd.close();
 
                 return new DJ.Track(track.title, PLATFORM_NAME);
             } catch (RuntimeException e) {

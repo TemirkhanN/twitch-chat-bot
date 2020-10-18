@@ -44,7 +44,7 @@ public class DJControl extends CommandHandler {
         if (fullCommand.equals(TRACK_INFO_COMMAND)) {
             Track track = getCurrentTrackInfo();
             if (track != null) {
-                output.write("Сейчас играет: " + track.getFullName());
+                output.write("SingsNote Сейчас играет: " + track.getFullName());
             } else {
                 output.write("Я не знаю, что сейчас играет. Может, LoFi hip-hop.");
             }
@@ -70,17 +70,23 @@ public class DJControl extends CommandHandler {
         }
 
         votesForSkip.add(initiator);
-        if (votesForSkip.size() >= votesRequiredForTrackSkip) {
-            for (Dj dj : deejays) {
-                if (dj.isPlaying(currentTrack)) {
-                    dj.skipCurrentTrack();
-
-                    return;
-                }
-            }
-            votesForSkip.clear();
+        if (votesForSkip.size() < votesRequiredForTrackSkip) {
+            output.write(initiator + " проголосовал за пропуск трека. Нужно еще " + (votesRequiredForTrackSkip - votesForSkip.size()));
+            return;
         }
 
+        for (Dj dj : deejays) {
+            if (dj.isPlaying(currentTrack)) {
+                dj.skipCurrentTrack();
+                votesForSkip.clear();
+
+                output.write("Демократия изгоняет трек из эфира. HSWP");
+
+                return;
+            }
+        }
+
+        output.write("Не удается пропустить трек.");
     }
 
     private Track getCurrentTrackInfo() {

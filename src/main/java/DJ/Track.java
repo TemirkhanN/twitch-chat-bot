@@ -18,6 +18,6 @@ public class Track {
     }
 
     public boolean equals(Track track) {
-        return getFullName().equals(track.getFullName());
+        return fullName.equals(track.getFullName()) && platformName.equals(track.getPlatform());
     }
 }
