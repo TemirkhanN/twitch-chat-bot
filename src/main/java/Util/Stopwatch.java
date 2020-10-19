@@ -7,7 +7,7 @@ public class Stopwatch {
         SECOND
     }
 
-    private long startTime;
+    private volatile long startTime;
 
     public Stopwatch() {
         startTime = System.currentTimeMillis();

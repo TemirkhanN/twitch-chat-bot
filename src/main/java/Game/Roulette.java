@@ -9,13 +9,13 @@ public class Roulette {
         OVER
     }
 
-    private Enum state;
+    private volatile Enum state;
 
-    private ArrayList<Player> players;
+    private volatile ArrayList<Player> players;
 
     private Revolver revolver;
 
-    private int currentPlayerPosition;
+    private volatile int currentPlayerPosition;
 
     public Roulette() {
         state = State.LOOKING_FOR_PLAYERS;
@@ -64,7 +64,7 @@ public class Roulette {
         state = State.STARTED;
     }
 
-    public Turn takeTurn() throws GameException {
+    public Turn takeTurn() {
         if (!isStarted()) {
             throw GameException.gameHasNotStartedYet();
         }
@@ -72,7 +72,9 @@ public class Roulette {
         Player currentPlayer;
         do {
             currentPlayer = players.get(currentPlayerPosition);
-            currentPlayerPosition = (currentPlayerPosition + 1) % players.size();
+             synchronized (this) {
+                currentPlayerPosition = (currentPlayerPosition + 1) % players.size();
+            }
         } while (currentPlayer.isLost());
 
         if (!revolver.shoot()) {

@@ -1,6 +1,6 @@
 package Game;
 
-public class GameException extends Exception {
+public class GameException extends RuntimeException {
     public final static int CODE_UNDEFINED = 0;
     public final static int CODE_GAME_HAS_ALREADY_STARTED = 1;
     public final static int CODE_NOT_ENOUGH_PLAYERS = 2;

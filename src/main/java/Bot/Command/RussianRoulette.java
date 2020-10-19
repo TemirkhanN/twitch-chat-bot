@@ -15,7 +15,7 @@ public class RussianRoulette extends CommandHandler {
     private final static String JOIN_COMMAND = COMMAND_PREFIX + " join";
     private final static String TAKE_TURN_COMMAND = COMMAND_PREFIX + " go";
 
-    private static Roulette game;
+    private Roulette game;
 
     private final static ScheduledExecutorService lobbyTimer = Executors.newScheduledThreadPool(1);
 
@@ -107,6 +107,12 @@ public class RussianRoulette extends CommandHandler {
             return;
         }
 
+        if (!game.isStarted()) {
+            output.write(player.getName() + ", игра еще не началась. Потерпи.");
+
+            return;
+        }
+
         if (!game.hasPlayer(player)) {
             output.write(player.getName() + ", ты не участвуешь в игре");
 
@@ -125,21 +131,14 @@ public class RussianRoulette extends CommandHandler {
             game.disqualify(currentTurnBelongsTo);
         }
 
-        Turn turn;
-        try {
-            turn = game.takeTurn();
-        } catch (GameException e) {
-            output.write(player.getName() + ", ты не должен сейчас этого делать");
-
-            return;
-        }
+        Turn turn = game.takeTurn();
 
         String message;
         Player nextTurnBelongsTo = game.getCurrentPlayer();
         if (!turn.isLucky()) {
             message = "Раздается звук выстрела и @" + player.getName() + "' выбывает из игры.";
             if (game.isOver()) {
-                message += "Поздравляю, @" + nextTurnBelongsTo.getName() + "! Твоя награда: (скоро добавим систему наград)";
+                message += "Поздравляю, @" + nextTurnBelongsTo.getName() + "! Твоя награда: все, что снимешь с проигравших Kappa";
             } else {
                 message += "@" + nextTurnBelongsTo.getName() + ", твой черед!";
             }

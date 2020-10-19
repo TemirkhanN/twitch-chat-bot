@@ -25,10 +25,10 @@ public class Spotify implements Dj {
     private String refreshToken;
 
     private class AuthToken {
-        String access_token;
-        String token_type;
-        int expires_in;
-        long instantiatedAtTime = 0;
+        volatile String access_token;
+        volatile String token_type;
+        volatile int expires_in;
+        volatile long instantiatedAtTime = 0;
 
         public String toString() {
             return token_type.substring(0, 1).toUpperCase() + token_type.substring(1) + " " + access_token;

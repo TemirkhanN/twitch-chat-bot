@@ -56,7 +56,7 @@ public class DJControl extends CommandHandler {
         return "Управление музыкой на канале";
     }
 
-    private void skipCurrentTrack(String initiator, OutputInterface output) {
+    private synchronized void skipCurrentTrack(String initiator, OutputInterface output) {
         Track currentTrack = getCurrentTrackInfo();
         if (currentTrack == null) {
             output.write("Если сейчас что-то играет, это за пределами моей досягаемости");
