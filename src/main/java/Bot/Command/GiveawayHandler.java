@@ -75,13 +75,13 @@ public class GiveawayHandler extends CommandHandler {
 
     private void participate(String participant, OutputInterface output) {
         if (giveaway.hasParticipant(participant)) {
-            output.write(participant + " ты уже принимаешь участи в раздаче.");
+            output.write(participant + " ты уже принимаешь участие в раздаче.");
 
             return;
         }
 
         giveaway.addParticipant(participant);
-        output.write(participant + "вступает в раздачу.");
+        output.write(participant + " вступает в раздачу.");
     }
 
     private boolean isParticipationCommand(Command command) {
