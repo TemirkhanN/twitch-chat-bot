@@ -1,5 +1,6 @@
 package DJ;
 
+import DJ.Exception.ServerError;
 import com.google.gson.Gson;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -121,10 +122,10 @@ public class Spotify implements Dj {
 
                 return new DJ.Track(track.toString(), PLATFORM_NAME);
             } catch (IOException e) {
-                throw new RuntimeException("Couldn't read from server", e);
+                throw new ServerError(getName(), "Couldn't read from server", e);
             }
         } catch (RuntimeException e) {
-            throw new RuntimeException("Server responded with invalid json", e);
+            throw new ServerError(getName(), "Server responded with invalid json", e);
         } finally {
             connection.disconnect();
         }
@@ -144,10 +145,10 @@ public class Spotify implements Dj {
         try {
             connection.connect();
             if (connection.getResponseCode() != 204) {
-                throw new RuntimeException("Couldn't skip track. Is it really playing?");
+                throw new ServerError(getName(), "Couldn't skip track. Is it really playing?");
             }
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't read from server", e);
+            throw new ServerError(getName(), "Couldn't read from server", e);
         }
     }
 
@@ -159,6 +160,11 @@ public class Spotify implements Dj {
         }
 
         return track.equals(currentTrack);
+    }
+
+    @Override
+    public String getName() {
+        return "Spotify";
     }
 
     private void authorize() {
@@ -194,7 +200,7 @@ public class Spotify implements Dj {
 
             return connection;
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't create connection", e);
+            throw new RuntimeException(getName() + ": couldn't create connection", e);
         }
     }
 }

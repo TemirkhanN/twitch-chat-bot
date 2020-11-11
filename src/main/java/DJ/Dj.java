@@ -6,4 +6,6 @@ public interface Dj {
     public void skipCurrentTrack();
 
     public boolean isPlaying(Track track);
+
+    public String getName();
 }

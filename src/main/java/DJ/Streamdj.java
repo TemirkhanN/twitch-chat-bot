@@ -1,5 +1,6 @@
 package DJ;
 
+import DJ.Exception.ServerError;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -40,10 +41,10 @@ public class Streamdj implements Dj {
 
                 return new DJ.Track(track.title, PLATFORM_NAME);
             } catch (RuntimeException e) {
-                throw new RuntimeException("Server responded with invalid json", e);
+                throw new ServerError(getName(), "Server responded with invalid json", e);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't read response from server", e);
+            throw new ServerError(getName(), "Couldn't read response from server", e);
         } finally {
             connection.disconnect();
         }
@@ -66,13 +67,18 @@ public class Streamdj implements Dj {
             BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             Result result = (new Gson()).fromJson(rd, Result.class);
             if (result.success != 1) {
-                throw new RuntimeException("Server couldn't skip current track");
+                throw new ServerError(getName(), "Server couldn't skip current track");
             }
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't read response from server");
+            throw new ServerError(getName(), "Couldn't read response from server");
         } finally {
             connection.disconnect();
         }
+    }
+
+    @Override
+    public String getName() {
+        return "StreamDJ";
     }
 
     private HttpURLConnection createConnection(String endpoint) {
@@ -83,7 +89,7 @@ public class Streamdj implements Dj {
 
             return connection;
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't create connection", e);
+            throw new RuntimeException(getName() + ": couldn't create connection", e);
         }
     }
 }
