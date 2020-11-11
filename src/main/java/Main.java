@@ -357,7 +357,7 @@ public class Main extends Application {
         }
 
         if (config.giveawayItems.size() > 0) {
-            chatBot.addChatHandler(new GiveawayHandler("!шапки", new Giveaway(new ArrayList<>(config.giveawayItems))));
+            chatBot.addChatHandler(new GiveawayHandler("!giveaway", new Giveaway(new ArrayList<>(config.giveawayItems))));
         }
 
         config.commands.forEach((command, response) -> chatBot.addChatCommand(command, response));
