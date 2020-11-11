@@ -9,13 +9,13 @@ public class Roulette {
         OVER
     }
 
-    private volatile Enum state;
+    private Enum state;
 
-    private volatile ArrayList<Player> players;
+    private ArrayList<Player> players;
 
     private Revolver revolver;
 
-    private volatile int currentPlayerPosition;
+    private int currentPlayerPosition;
 
     public Roulette() {
         state = State.LOOKING_FOR_PLAYERS;

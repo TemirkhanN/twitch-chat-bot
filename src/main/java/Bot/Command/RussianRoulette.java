@@ -15,7 +15,7 @@ public class RussianRoulette extends CommandHandler {
     private final static String JOIN_COMMAND = COMMAND_PREFIX + " join";
     private final static String TAKE_TURN_COMMAND = COMMAND_PREFIX + " go";
 
-    private Roulette game;
+    private volatile Roulette game;
 
     private final static ScheduledExecutorService lobbyTimer = Executors.newScheduledThreadPool(1);
 

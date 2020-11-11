@@ -21,14 +21,14 @@ public class Spotify implements Dj {
     private static final String API_PLAY_NEXT_TRACK = "https://api.spotify.com/v1/me/player/next";
 
     private String credentials;
-    private AuthToken auth;
+    private volatile AuthToken auth;
     private String refreshToken;
 
     private class AuthToken {
-        volatile String access_token;
-        volatile String token_type;
-        volatile int expires_in;
-        volatile long instantiatedAtTime = 0;
+        String access_token;
+        String token_type;
+        int expires_in;
+        long instantiatedAtTime = 0;
 
         public String toString() {
             return token_type.substring(0, 1).toUpperCase() + token_type.substring(1) + " " + access_token;
