@@ -41,7 +41,13 @@ public class GiveawayHandler extends CommandHandler {
         }
 
         if (isParticipantListCommand(command)) {
-            output.write("Список участников: " + giveaway.getParticipants().toString());
+            output.write("Список участников: " + giveaway.getParticipantsInfo());
+
+            return;
+        }
+
+        if (isItemListCommand(command)) {
+            output.write("Предметы на раздачу: " + giveaway.getItemsInfo());
 
             return;
         }
@@ -86,6 +92,10 @@ public class GiveawayHandler extends CommandHandler {
 
     private boolean isParticipationCommand(Command command) {
         return command.getCommand().equals(commandToParticipate);
+    }
+
+    private boolean isItemListCommand(Command command) {
+        return command.getCommand().equals("!giveaway items");
     }
 
     private boolean isParticipantListCommand(Command command) {

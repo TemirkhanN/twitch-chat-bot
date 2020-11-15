@@ -27,8 +27,12 @@ public class Giveaway {
         participants.add(participant);
     }
 
-    public List<String> getParticipants() {
-        return new ArrayList<>(participants);
+    public String getParticipantsInfo() {
+        return (new ArrayList<>(participants)).toString();
+    }
+
+    public String getItemsInfo() {
+        return items.toString();
     }
 
     public boolean hasParticipant(String participant) {
