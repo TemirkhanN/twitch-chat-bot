@@ -20,6 +20,8 @@ public class Bot extends User implements OutputInterface {
     private CommandBus commandBus;
     private ArrayList<Announcement> singleTimeAnnouncements;
     private ArrayList<Announcement> repeatingAnnouncements;
+    private ScheduledExecutorService announcer;
+
     private Question chatCommandHandler;
 
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -55,7 +57,7 @@ public class Bot extends User implements OutputInterface {
         channel.join(this);
         channel.keepConnectionAlive();
 
-        handleAnnouncements();
+        scheduleAnnouncements();
         listenToChat();
         uptime = new Stopwatch();
         addChatCommand("uptime", () -> uptime.toString());
@@ -66,9 +68,7 @@ public class Bot extends User implements OutputInterface {
             return;
         }
 
-        for (Announcement announcement : repeatingAnnouncements) {
-            announcement.cancel();
-        }
+        stopAnnouncements();
 
         channel.leave();
         channel = null;
@@ -108,16 +108,21 @@ public class Bot extends User implements OutputInterface {
         channel.sendMessage(message);
     }
 
-    private void handleAnnouncements() {
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(repeatingAnnouncements.size());
+    private void scheduleAnnouncements() {
+        announcer = Executors.newScheduledThreadPool(repeatingAnnouncements.size());
         for (Announcement announcement : singleTimeAnnouncements) {
-            executor.execute(announcement);
+            announcer.execute(announcement);
         }
 
         for (Announcement announcement : repeatingAnnouncements) {
             int announcementFrequency = announcement.getFrequency();
-            executor.scheduleAtFixedRate(announcement, announcementFrequency, announcementFrequency, TimeUnit.MINUTES);
+            announcer.scheduleAtFixedRate(announcement, announcementFrequency, announcementFrequency, TimeUnit.MINUTES);
         }
+    }
+
+    private void stopAnnouncements() {
+        announcer.shutdownNow();
+        announcer = null;
     }
 
     private void listenToChat() {
