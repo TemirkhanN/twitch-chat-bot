@@ -115,7 +115,13 @@ public class Spotify implements Dj {
                 }
 
                 BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                Track track = (new Gson()).fromJson(rd, Track.class);
+                String responseContent = rd.lines().collect(Collectors.joining(System.lineSeparator()));
+                rd.close();
+                if (responseContent.isEmpty()) {
+                    return null;
+                }
+
+                Track track = (new Gson()).fromJson(responseContent, Track.class);
                 if (!track.is_playing) {
                     return null;
                 }
@@ -125,7 +131,7 @@ public class Spotify implements Dj {
                 throw new ServerError(getName(), "Couldn't read from server", e);
             }
         } catch (RuntimeException e) {
-            throw new ServerError(getName(), "Server responded with invalid json", e);
+            throw new ServerError(getName(), "Unexpected error occurred", e);
         } finally {
             connection.disconnect();
         }

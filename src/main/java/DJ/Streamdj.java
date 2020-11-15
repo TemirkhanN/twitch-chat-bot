@@ -2,12 +2,14 @@ package DJ;
 
 import DJ.Exception.ServerError;
 import com.google.gson.Gson;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.stream.Collectors;
 
 public class Streamdj implements Dj {
     private static final String PLATFORM_NAME = "streamdj";
@@ -17,8 +19,17 @@ public class Streamdj implements Dj {
     private String apiKey;
     private int channelId;
 
+
+    private HttpClient transport;
+
     public class Track {
         String title;
+        String yid;
+
+        @Override
+        public String toString() {
+            return title + " https://www.youtube.com/watch?v=" + yid;
+        }
     }
 
     public class Result {
@@ -28,25 +39,34 @@ public class Streamdj implements Dj {
     public Streamdj(int channelId, String apiKey) {
         this.apiKey = apiKey;
         this.channelId = channelId;
+        this.transport = HttpClientBuilder.create().build();
     }
 
     @Override
     public DJ.Track getCurrentTrack() {
-        HttpURLConnection connection = createConnection(API_URL + "get_track/" + channelId);
         try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            try {
-                Track track = (new Gson()).fromJson(rd, Track.class);
-                rd.close();
+            HttpResponse response = transport.execute(new HttpGet(API_URL + "get_track/" + channelId));
+            if (response.getStatusLine().getStatusCode() != 200) {
+                return null;
+            }
 
-                return new DJ.Track(track.title, PLATFORM_NAME);
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            try {
+                String responseContent = rd.lines().collect(Collectors.joining(System.lineSeparator()));
+                rd.close();
+                // Handler for super shitty API from streamDJ
+                if (responseContent.isEmpty() || responseContent.equals("null")) {
+                    return null;
+                }
+
+                Track track = (new Gson()).fromJson(responseContent, Track.class);
+
+                return new DJ.Track(track.toString(), PLATFORM_NAME);
             } catch (RuntimeException e) {
                 throw new ServerError(getName(), "Server responded with invalid json", e);
             }
         } catch (IOException e) {
             throw new ServerError(getName(), "Couldn't read response from server", e);
-        } finally {
-            connection.disconnect();
         }
     }
 
@@ -62,34 +82,24 @@ public class Streamdj implements Dj {
 
     @Override
     public void skipCurrentTrack() {
-        HttpURLConnection connection = createConnection(API_URL + "request_skip/" + channelId + "/" + apiKey);
         try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            HttpResponse response = transport.execute(new HttpGet(API_URL + "request_skip/" + channelId + "/" + apiKey));
+            if (response.getStatusLine().getStatusCode() != 200) {
+                return;
+            }
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             Result result = (new Gson()).fromJson(rd, Result.class);
             if (result.success != 1) {
                 throw new ServerError(getName(), "Server couldn't skip current track");
             }
         } catch (IOException e) {
             throw new ServerError(getName(), "Couldn't read response from server");
-        } finally {
-            connection.disconnect();
         }
     }
 
     @Override
     public String getName() {
         return "StreamDJ";
-    }
-
-    private HttpURLConnection createConnection(String endpoint) {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) (new URL(endpoint)).openConnection();
-            connection.setRequestMethod("GET");
-            connection.setUseCaches(false);
-
-            return connection;
-        } catch (IOException e) {
-            throw new RuntimeException(getName() + ": couldn't create connection", e);
-        }
     }
 }

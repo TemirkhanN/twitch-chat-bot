@@ -345,12 +345,12 @@ public class Main extends Application {
         if (config.modules.contains("DJ")) {
             DJControl djControl = new DJControl();
 
-            if (!config.spotifyClientId.isEmpty()) {
-                djControl.addDj(new Spotify(config.spotifyClientId, config.spotifyClientSecret, config.spotifyRefreshToken));
-            }
-
             if (config.djChannel != -1) {
                 djControl.addDj(new Streamdj(config.djChannel, config.djToken));
+            }
+
+            if (!config.spotifyClientId.isEmpty()) {
+                djControl.addDj(new Spotify(config.spotifyClientId, config.spotifyClientSecret, config.spotifyRefreshToken));
             }
 
             chatBot.addChatHandler(djControl);
