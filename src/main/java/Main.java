@@ -370,7 +370,7 @@ public class Main extends Application {
         config.commands.forEach((command, response) -> questionHandler.addAnswer("!" + command, response));
         commandsHandler.registerHandler(questionHandler);
 
-        chatBot.setChatHandler(commandsHandler);
+        chatBot.setChatHandler(new CommandRpmLimit(10, commandsHandler));
 
         chatBot.joinChannel(config.channelName);
     }
