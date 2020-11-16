@@ -8,10 +8,12 @@ import java.util.ArrayList;
 public class GiveawayHandler extends CommandHandler {
     private String commandToParticipate;
     private Giveaway giveaway;
+    private OutputInterface output;
 
-    public GiveawayHandler(String commandToParticipate, Giveaway giveaway) {
+    public GiveawayHandler(String commandToParticipate, Giveaway giveaway, OutputInterface output) {
         this.commandToParticipate = commandToParticipate;
         this.giveaway = giveaway;
+        this.output = output;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class GiveawayHandler extends CommandHandler {
     }
 
     @Override
-    protected void run(Command command, OutputInterface output) {
+    public void handle(Command command) {
         if (giveaway.isOver()) {
             output.write("Раздача завершена.");
 
@@ -37,7 +39,7 @@ public class GiveawayHandler extends CommandHandler {
         }
 
         if (isParticipationCommand(command)) {
-            participate(command.getInitiator(), output);
+            participate(command.getInitiator());
         }
 
         if (isParticipantListCommand(command)) {
@@ -53,13 +55,13 @@ public class GiveawayHandler extends CommandHandler {
         }
 
         if (isGiveawayStartCommand(command) && command.isInitiatedByAdmin()) {
-            startGiveaway(output);
+            startGiveaway();
 
             return;
         }
     }
 
-    private void startGiveaway(OutputInterface output) {
+    private void startGiveaway() {
         try {
             giveaway.startGiveaway();
         } catch (LogicException e) {
@@ -79,7 +81,7 @@ public class GiveawayHandler extends CommandHandler {
         output.write(giveawayResult.toString());
     }
 
-    private void participate(String participant, OutputInterface output) {
+    private void participate(String participant) {
         if (giveaway.hasParticipant(participant)) {
             output.write(participant + " ты уже принимаешь участие в раздаче.");
 

@@ -8,9 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 
 public class DJControl extends CommandHandler {
-    private static final String COMMAND_PREFIX = "!music";
-    private static final String SKIP_COMMAND = COMMAND_PREFIX + " skip";
-    private static final String TRACK_INFO_COMMAND = COMMAND_PREFIX + "";
+    private static final String SKIP_COMMAND = "!skip";
+    private static final String TRACK_INFO_COMMAND = "!music";
 
     private int votesRequiredForTrackSkip = 3;
     private String currentTrackName = "";
@@ -18,6 +17,12 @@ public class DJControl extends CommandHandler {
     private HashSet<String> votesForSkip = new HashSet<>();
 
     private List<Dj> deejays = new ArrayList<>();
+
+    private OutputInterface output;
+
+    public DJControl(OutputInterface output) {
+        this.output = output;
+    }
 
     public void addDj(Dj dj) {
         deejays.add(dj);
@@ -29,14 +34,23 @@ public class DJControl extends CommandHandler {
             return false;
         }
 
-        return command.startsWith(COMMAND_PREFIX + " ") || command.getCommand().equals(COMMAND_PREFIX);
+        String commandText = command.getCommand();
+        if (commandText.equals(SKIP_COMMAND)) {
+            return true;
+        }
+
+        if (commandText.equals(TRACK_INFO_COMMAND)) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
-    protected void run(Command command, OutputInterface output) {
+    public void handle(Command command) {
         String fullCommand = command.getCommand();
         if (fullCommand.equals(SKIP_COMMAND)) {
-            skipCurrentTrack(command.getInitiator(), output);
+            skipCurrentTrack(command);
 
             return;
         }
@@ -51,12 +65,7 @@ public class DJControl extends CommandHandler {
         }
     }
 
-    @Override
-    protected String getDescription() {
-        return "Управление музыкой на канале";
-    }
-
-    private synchronized void skipCurrentTrack(String initiator, OutputInterface output) {
+    private synchronized void skipCurrentTrack(Command command) {
         Track currentTrack = getCurrentTrackInfo();
         if (currentTrack == null) {
             output.write("Если сейчас что-то играет, это за пределами моей досягаемости");
@@ -69,8 +78,9 @@ public class DJControl extends CommandHandler {
             votesForSkip.clear();
         }
 
+        String initiator = command.getInitiator();
         votesForSkip.add(initiator);
-        if (votesForSkip.size() < votesRequiredForTrackSkip) {
+        if (!command.isInitiatedByAdmin() && votesForSkip.size() < votesRequiredForTrackSkip) {
             output.write(initiator + " проголосовал за пропуск трека. Нужно еще " + (votesRequiredForTrackSkip - votesForSkip.size()));
             return;
         }

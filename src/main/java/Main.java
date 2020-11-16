@@ -333,17 +333,23 @@ public class Main extends Application {
     private void connect(Logger logger, Config config) {
         chatBot = new Bot(config.botName, config.authToken);
         chatBot.setLogger(logger);
+        OutputInterface output = chatBot;
 
+        // Announcements
+        config.announcements.forEach((pos, announcementText) -> chatBot.addAnnouncement(announcementText.getText(), announcementText.getFrequency()));
+
+        // Chat command handlers
+        CommandBus commandsHandler = new CommandBus();
         if (config.modules.contains("SoundReaction")) {
-            chatBot.addChatHandler(new SoundReaction());
+            commandsHandler.registerHandler(new SoundReaction());
         }
 
         if (config.modules.contains("RussianRoulette")) {
-            chatBot.addChatHandler(new RussianRoulette());
+            commandsHandler.registerHandler(new RussianRoulette(output));
         }
 
         if (config.modules.contains("DJ")) {
-            DJControl djControl = new DJControl();
+            DJControl djControl = new DJControl(output);
 
             if (config.djChannel != -1) {
                 djControl.addDj(new Streamdj(config.djChannel, config.djToken));
@@ -353,16 +359,18 @@ public class Main extends Application {
                 djControl.addDj(new Spotify(config.spotifyClientId, config.spotifyClientSecret, config.spotifyRefreshToken));
             }
 
-            chatBot.addChatHandler(djControl);
+            commandsHandler.registerHandler(djControl);
         }
 
         if (config.giveawayItems.size() > 0) {
-            chatBot.addChatHandler(new GiveawayHandler("!giveaway", new Giveaway(new ArrayList<>(config.giveawayItems))));
+            commandsHandler.registerHandler(new GiveawayHandler("!giveaway", new Giveaway(new ArrayList<>(config.giveawayItems)), output));
         }
 
-        config.commands.forEach((command, response) -> chatBot.addChatCommand(command, response));
+        Question questionHandler = new Question(chatBot);
+        config.commands.forEach((command, response) -> questionHandler.addAnswer("!" + command, response));
+        commandsHandler.registerHandler(questionHandler);
 
-        config.announcements.forEach((pos, announcementText) -> chatBot.addAnnouncement(announcementText.getText(), announcementText.getFrequency()));
+        chatBot.setChatHandler(commandsHandler);
 
         chatBot.joinChannel(config.channelName);
     }

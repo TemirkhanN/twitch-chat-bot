@@ -8,8 +8,11 @@ public class Question extends CommandHandler {
 
     private HashMap<String, Supplier<String>> answers;
 
-    public Question() {
+    private OutputInterface output;
+
+    public Question(OutputInterface output) {
         answers = new HashMap<>();
+        this.output = output;
     }
 
     public void addAnswer(String question, String answer) {
@@ -26,7 +29,7 @@ public class Question extends CommandHandler {
     }
 
     @Override
-    protected void run(Command command, OutputInterface output) {
+    public void handle(Command command) {
         String response = answers.get(command.getCommand()).get();
         if (response == null) {
             return;

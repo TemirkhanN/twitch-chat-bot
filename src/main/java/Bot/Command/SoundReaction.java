@@ -56,6 +56,12 @@ public class SoundReaction extends CommandHandler {
         reactions.put("god", "individual/4t4ri26oo/godlike");
     }
 
+    @Override
+    public void handle(Command command) {
+        playReaction(command.getCommand().toLowerCase());
+    }
+
+    @Override
     public boolean supports(Command command) {
         String reactionName = command.getCommand().toLowerCase();
         if (!exists(reactionName)) {
@@ -63,14 +69,6 @@ public class SoundReaction extends CommandHandler {
         }
 
         return isAllowedToUseReaction(command.getInitiator(), reactionName);
-    }
-
-    protected void run(Command command, OutputInterface output) {
-        playReaction(command.getCommand().toLowerCase());
-    }
-
-    protected String getDescription() {
-        return "Звуковые реакции, которые воспроизводятся на стриме.";
     }
 
     private boolean exists(String reactionName) {

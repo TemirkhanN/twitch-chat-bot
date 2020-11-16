@@ -21,6 +21,12 @@ public class RussianRoulette extends CommandHandler {
 
     private Stopwatch currentTurnTime = new Stopwatch();
 
+    private OutputInterface output;
+
+    public RussianRoulette(OutputInterface output) {
+        this.output = output;
+    }
+
     @Override
     public boolean supports(Command command) {
         String commandText = command.getCommand();
@@ -32,35 +38,30 @@ public class RussianRoulette extends CommandHandler {
             return true;
         }
 
-        return commandText.equals(COMMAND_PREFIX);
-
+        return false;
     }
 
     @Override
-    protected void run(Command command, OutputInterface output) {
+    public void handle(Command command) {
         String commandText = command.getCommand();
         Player player = new Player(command.getInitiator());
 
-        switch(commandText) {
-            case JOIN_COMMAND:
-                joinGame(player, output);
-                break;
-            case TAKE_TURN_COMMAND:
-                takeTurn(player, output);
-                break;
-            default:
-                output.write(getDescription());
-                break;
+        if (commandText.equals(JOIN_COMMAND)) {
+            joinGame(player);
+
+            return;
+        }
+
+        if (commandText.equals(TAKE_TURN_COMMAND)) {
+            takeTurn(player);
+
+            return;
         }
     }
 
-    protected String getDescription() {
-        return "Игра рулетка. Вступить в игру можно командой «!r join». Когда игра начнется, ход делается командой «!r go».";
-    }
-
-    private void createNewGame(OutputInterface output) {
+    private void createNewGame() {
         game = new Roulette();
-        lobbyTimer.schedule(()->{
+        lobbyTimer.schedule(() -> {
             if (!game.isLookingForPlayers()) {
                 throw new RuntimeException("Game should be looking for players");
             }
@@ -78,16 +79,16 @@ public class RussianRoulette extends CommandHandler {
         }, 1, TimeUnit.MINUTES);
     }
 
-    private void joinGame(Player player, OutputInterface output) {
+    private void joinGame(Player player) {
         if (game == null || game.isOver()) {
-            createNewGame(output);
+            createNewGame();
         }
 
         try {
             game.join(player);
             output.write(player.getName() + " вступает в игру.");
         } catch (GameException err) {
-            switch(err.getCode()) {
+            switch (err.getCode()) {
                 case GameException.CODE_PLAYER_ALREADY_JOINED:
                     output.write(player.getName() + ", ты уже участвуешь в игре.");
                     break;
@@ -100,7 +101,7 @@ public class RussianRoulette extends CommandHandler {
         }
     }
 
-    private void takeTurn(Player player, OutputInterface output) {
+    private void takeTurn(Player player) {
         if (game == null || game.isOver()) {
             output.write(player.getName() + ", сейчас нет доступных игр. Создай свою командой " + JOIN_COMMAND);
 

@@ -2,7 +2,6 @@ package Bot;
 
 import Bot.Command.*;
 import Util.Logger.Logger;
-import Util.Stopwatch;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -11,33 +10,24 @@ import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 public class Bot extends User implements OutputInterface {
-    private static final String CHAT_COMMAND_PREFIX = "!";
     private String token;
     private Channel channel;
-    private CommandBus commandBus;
+    private CommandHandlerInterface chatHandler;
     private ArrayList<Announcement> singleTimeAnnouncements;
     private ArrayList<Announcement> repeatingAnnouncements;
     private ScheduledExecutorService announcer;
 
-    private Question chatCommandHandler;
-
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private Logger logger;
-
-    private Stopwatch uptime;
 
     public Bot(String name, String token) {
         super(name, true);
 
         this.token = token;
-        commandBus = new CommandBus();
         singleTimeAnnouncements = new ArrayList<>();
         repeatingAnnouncements = new ArrayList<>();
-        chatCommandHandler = new Question();
-        addChatHandler(chatCommandHandler);
     }
 
     public void setLogger(Logger logWriter) {
@@ -46,6 +36,10 @@ public class Bot extends User implements OutputInterface {
         }
 
         logger = logWriter;
+    }
+
+    public void setChatHandler(CommandHandlerInterface handler) {
+        this.chatHandler = handler;
     }
 
     String getToken() {
@@ -59,8 +53,6 @@ public class Bot extends User implements OutputInterface {
 
         scheduleAnnouncements();
         listenToChat();
-        uptime = new Stopwatch();
-        addChatCommand("uptime", () -> uptime.toString());
     }
 
     public void stop() {
@@ -75,7 +67,6 @@ public class Bot extends User implements OutputInterface {
         if (logger != null) {
             logger.close();
         }
-        uptime = null;
     }
 
     public void addAnnouncement(String text, int everyNMinitues) {
@@ -86,25 +77,13 @@ public class Bot extends User implements OutputInterface {
         }
     }
 
-    public void addChatHandler(CommandHandler handler) {
-        commandBus.registerHandler(handler);
-    }
-
-    public void addChatCommand(String command, String response) {
-        chatCommandHandler.addAnswer(CHAT_COMMAND_PREFIX + command, response);
-    }
-
-    public void addChatCommand(String command, Supplier<String> response) {
-        chatCommandHandler.addAnswer(CHAT_COMMAND_PREFIX + command, response);
-    }
-
     @Override
     public void write(String message) {
         if (channel == null) {
             throw new RuntimeException("Bot can not write messages while not connected");
         }
 
-        log(getName() + " PRIVMSG #"+ channel.getName() + " :" + message);
+        log(getName() + " PRIVMSG #" + channel.getName() + " :" + message);
         channel.sendMessage(message);
     }
 
@@ -126,13 +105,11 @@ public class Bot extends User implements OutputInterface {
     }
 
     private void listenToChat() {
+        if (chatHandler == null) {
+            return;
+        }
+
         class ChatCommandHandle implements Runnable {
-            private OutputInterface outputWriter;
-
-            private ChatCommandHandle(OutputInterface outputWriter) {
-                this.outputWriter = outputWriter;
-            }
-
             public void run() {
                 try {
                     Message message;
@@ -141,10 +118,10 @@ public class Bot extends User implements OutputInterface {
                         log(message.toString());
                         command = message.getCommonPart();
                         if (command != null) {
-                            commandBus.execute(new Command(command, message.getSender()), outputWriter);
+                            chatHandler.handle(new Command(command, message.getSender()));
                         }
                     }
-                } catch (IOException|RuntimeException e) {
+                } catch (IOException | RuntimeException e) {
                     log(e.toString());
                     if (channel != null) {
                         joinChannel(channel.getName());
@@ -153,7 +130,7 @@ public class Bot extends User implements OutputInterface {
             }
         }
 
-        new Thread(new ChatCommandHandle(this)).start();
+        new Thread(new ChatCommandHandle()).start();
     }
 
     private void log(String data) {
