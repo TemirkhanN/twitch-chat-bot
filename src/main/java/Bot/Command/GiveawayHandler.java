@@ -31,11 +31,11 @@ public class GiveawayHandler extends CommandHandler {
     }
 
     @Override
-    public void handle(Command command) {
+    public int handle(Command command) {
         if (giveaway.isOver()) {
             output.write("Раздача завершена.");
 
-            return;
+            return RESULT_CODE_OK;
         }
 
         if (isParticipationCommand(command)) {
@@ -45,20 +45,22 @@ public class GiveawayHandler extends CommandHandler {
         if (isParticipantListCommand(command)) {
             output.write("Список участников: " + giveaway.getParticipantsInfo());
 
-            return;
+            return RESULT_CODE_OK;
         }
 
         if (isItemListCommand(command)) {
             output.write("Предметы на раздачу: " + giveaway.getItemsInfo());
 
-            return;
+            return RESULT_CODE_OK;
         }
 
         if (isGiveawayStartCommand(command) && command.isInitiatedByAdmin()) {
             startGiveaway();
 
-            return;
+            return RESULT_CODE_OK;
         }
+
+        return RESULT_CODE_ERROR;
     }
 
     private void startGiveaway() {

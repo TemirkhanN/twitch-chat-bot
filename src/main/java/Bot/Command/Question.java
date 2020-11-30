@@ -29,10 +29,10 @@ public class Question extends CommandHandler {
     }
 
     @Override
-    public void handle(Command command) {
+    public int handle(Command command) {
         String response = answers.get(command.getCommand()).get();
         if (response == null) {
-            return;
+            return RESULT_CODE_ERROR;
         }
 
         if (response.contains(PLACEHOLDER_SENDER_NAME)) {
@@ -40,5 +40,7 @@ public class Question extends CommandHandler {
         }
 
         output.write(response);
+
+        return RESULT_CODE_OK;
     }
 }

@@ -10,13 +10,13 @@ public class CommandBus implements CommandHandlerInterface {
     }
 
     @Override
-    public void handle(Command command) {
+    public int handle(Command command) {
         for(CommandHandler handler: handlers) {
             if (handler.supports(command)) {
-                handler.handle(command);
-
-                return;
+                return handler.handle(command);
             }
         }
+
+        return RESULT_CODE_ERROR;
     }
 }

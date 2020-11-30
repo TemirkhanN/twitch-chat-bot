@@ -57,8 +57,17 @@ public class SoundReaction extends CommandHandler {
     }
 
     @Override
-    public void handle(Command command) {
-        playReaction(command.getCommand().toLowerCase());
+    public int handle(Command command) {
+        String reactionName = command.getCommand().toLowerCase();
+
+        if (!exists(reactionName)) {
+            return RESULT_CODE_ERROR;
+        }
+
+        String soundPath = getReactionSoundPath(reactionName);
+        playSound(soundPath);
+
+        return RESULT_CODE_OK;
     }
 
     @Override
@@ -73,15 +82,6 @@ public class SoundReaction extends CommandHandler {
 
     private boolean exists(String reactionName) {
         return getReactionSoundPath(reactionName) != null;
-    }
-
-    private void playReaction(String reactionName) {
-        if (!exists(reactionName)) {
-            return;
-        }
-
-        String soundPath = getReactionSoundPath(reactionName);
-        playSound(soundPath);
     }
 
     private String getReactionSoundPath(String reactionName) {

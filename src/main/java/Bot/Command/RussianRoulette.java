@@ -42,21 +42,23 @@ public class RussianRoulette extends CommandHandler {
     }
 
     @Override
-    public void handle(Command command) {
+    public int handle(Command command) {
         String commandText = command.getCommand();
         Player player = new Player(command.getInitiator());
 
         if (commandText.equals(JOIN_COMMAND)) {
             joinGame(player);
 
-            return;
+            return RESULT_CODE_OK;
         }
 
         if (commandText.equals(TAKE_TURN_COMMAND)) {
             takeTurn(player);
 
-            return;
+            return RESULT_CODE_OK;
         }
+
+        return RESULT_CODE_ERROR;
     }
 
     private void createNewGame() {

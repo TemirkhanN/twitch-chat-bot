@@ -47,12 +47,12 @@ public class DJControl extends CommandHandler {
     }
 
     @Override
-    public void handle(Command command) {
+    public int handle(Command command) {
         String fullCommand = command.getCommand();
         if (fullCommand.equals(SKIP_COMMAND)) {
             skipCurrentTrack(command);
 
-            return;
+            return RESULT_CODE_OK;
         }
 
         if (fullCommand.equals(TRACK_INFO_COMMAND)) {
@@ -62,7 +62,11 @@ public class DJControl extends CommandHandler {
             } else {
                 output.write("Я не знаю, что сейчас играет. Может, LoFi hip-hop.");
             }
+
+            return RESULT_CODE_OK;
         }
+
+        return RESULT_CODE_ERROR;
     }
 
     private synchronized void skipCurrentTrack(Command command) {

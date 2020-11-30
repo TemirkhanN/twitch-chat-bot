@@ -21,20 +21,23 @@ public class CommandRpmLimit implements CommandHandlerInterface {
     }
 
     @Override
-    public void handle(Command command) {
+    public int handle(Command command) {
         String initiator = command.getInitiator();
         if (initiatorsLog.contains(initiator)) {
-            return;
+            return RESULT_CODE_OK;
         }
-        initiatorsLog.add(initiator);
 
-        TimerTask task = new TimerTask() {
-            public void run() {
-                initiatorsLog.remove(initiator);
-            }
-        };
-        timer.schedule(task, cooldownDelay);
+        int result = handler.handle(command);
+        if (result == RESULT_CODE_OK) {
+            initiatorsLog.add(initiator);
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    initiatorsLog.remove(initiator);
+                }
+            };
+            timer.schedule(task, cooldownDelay);
+        }
 
-        handler.handle(command);
+        return result;
     }
 }
